@@ -1,0 +1,10 @@
+{
+    "name": "大葱的学习归档库",
+    "ver": "马晓雨",
+    "logo": "",
+    "testing": false,
+    "colour": "",
+    "github-url": "https://github.com/ScallionDream",
+    "page-mounts": true,
+	"imports": [ "amWiki/css/aiticle-font.css" ]
+}
