@@ -695,7 +695,7 @@ Django模板引擎之母版：
 
 ## Cookie
 
-- cookie是保存在浏览器上的键值对。
+- cookie是保存在浏览器上的键值对。可以放多对，敏感信息不放在这里。
 - 服务端可以向用户浏览器端写cookie
 - 客户端每次发送请求的时候，会携带cookie去。Cookie是携带在请求头中的。
 - Cookie一般情况下是用来做用户登录的。
@@ -1243,4 +1243,29 @@ class PageInfor(object):
 ```
 
 
+
+
+
+## Django Admin
+
+> Django Admin是由Django自身提供的一个管理后台
+
+创建用户名密码：
+
+```python
+python manage.py createsuperuser
+```
+
+
+
+```python
+# admin.py
+from django.crontrib import admin
+from app01 import models
+admin.site.register(models.UserInfo)
+```
+
+这样操作就可以把我们自己创建的Userinfo注册到Django
+
+就可以在Django admin中操作数据表了。
 
