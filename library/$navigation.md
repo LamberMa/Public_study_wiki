@@ -156,6 +156,8 @@
         - [Django_orm初识](?file=03-03、Python/05-Django/03-Django ORM/01-Django_orm初识 "Django_orm初识")
         - [Django_Models](?file=03-03、Python/05-Django/03-Django ORM/02-Django_Models "Django_Models")
         - [ORM数据操作](?file=03-03、Python/05-Django/03-Django ORM/03-ORM数据操作 "ORM数据操作")
+    - [Django模板](?file=03-03、Python/05-Django/04-Django模板 "Django模板")
+    - [Cookie和Session](?file=03-03、Python/05-Django/05-Cookie和Session "Cookie和Session")
     - [Django安全](?file=03-03、Python/05-Django/06-Django安全 "Django安全")
     - [Django常见小问题](?file=03-03、Python/05-Django/99-Django常见小问题 "Django常见小问题")
 - **Flask&Tornado**
@@ -174,6 +176,7 @@
     - **轮子库**
 - **最佳实践**
     - [001-使用YAML作为项目的配置](?file=03-03、Python/11-最佳实践/001-001-使用YAML作为项目的配置 "001-使用YAML作为项目的配置")
+    - [002-VirtualEnv](?file=03-03、Python/11-最佳实践/002-002-VirtualEnv "002-VirtualEnv")
 - **扩展阅读**
     - **算法图解读书笔记**
     - **编程思维**
@@ -182,6 +185,8 @@
         - [图解http--1](?file=03-03、Python/12-扩展阅读/02-图解HTTP读书笔记/01-图解http--1 "图解http--1")
     - **流畅的Python读书笔记**
         - [Python的数据类型](?file=03-03、Python/12-扩展阅读/03-流畅的Python读书笔记/00-Python的数据类型 "Python的数据类型")
+    - **Python CookBook**
+        - [01、数据结构和算法](?file=03-03、Python/12-扩展阅读/04-Python CookBook/01-01、数据结构和算法 "01、数据结构和算法")
 - [Python代码风格（PEP8）](?file=03-03、Python/98-Python代码风格（PEP8） "Python代码风格（PEP8）")
 - [Python报错统计](?file=03-03、Python/99-Python报错统计 "Python报错统计")
 
