@@ -5,6 +5,24 @@
 > - python3.6
 > - Django：1.10.6
 
+```
+# 一些没整理的文章
+http://www.pythonzh.cn/category/newbie-qa/
+http://www.cnblogs.com/wupeiqi/articles/5812291.html
+https://github.com/jhao104/django-blog
+https://www.cnblogs.com/WeyneChen/p/6670592.html
+https://www.zhihu.com/question/24368769
+https://github.com/hinesboy/mavonEditor
+https://www.jianshu.com/p/04376d0c9ff1
+http://www.cnblogs.com/wupeiqi/articles/5703697.html
+http://www.cnblogs.com/wupeiqi/articles/6144178.html
+http://www.cnblogs.com/haiyan123/p/8387770.html#lable13
+https://www.cluas.me/blog/10/
+http://blog.csdn.net/secretx/article/details/73498148
+```
+
+
+
 ### 创建虚拟环境
 
 ```shell
@@ -301,5 +319,44 @@ pip install Pygments
 
 ```
 评论也是支持markdown的，不过这次是用户输入的，不能保证安全，所以还要使用 bleach 清理不允许的标签，像我刚提交的<script></body>如果不清理直接前端 body|safe 的话，页面会乱掉。博主这个是处理的了。
+```
+
+### Django自定义标签
+
+> 遵循Django的规范使用自定义标签
+
+新建一个名为templatetags的Python Package，然后在目录下新建一个blog_tags.py。这个文件存放自定义的模板标签代码：
+
+```shell
+(blog2) ➜  blog2 > tree -L 2
+.
+├── blog
+│   ├── __init__.py
+│   ├── __pycache__
+│   ├── admin.py
+│   ├── apps.py
+│   ├── migrations
+│   ├── models.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── blog2
+│   ├── __init__.py
+│   ├── __pycache__
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── db.sqlite3
+├── manage.py
+├── static
+│   ├── css
+│   └── js
+├── template
+│   ├── __init__.py
+│   ├── base.html
+│   └── blog
+└── templatetags
+    ├── __init__.py
+    └── blog_tags.py
 ```
 
