@@ -281,3 +281,107 @@ PS: 返回值为字段在数据库中的属性，Django字段默认的值为：
 小结：
 
 - Django Admin定制型太强，一般不会用很多，或者根本不用
+
+
+
+
+
+```python
+# ########### 基础函数 ###########
+
+    # 1. Concat，用于做类型转换
+    # v = models.UserInfo.objects.annotate(c=Cast('pwd', FloatField()))
+
+    # 2. Coalesce，从前向后，查询第一个不为空的值
+    # v = models.UserInfo.objects.annotate(c=Coalesce('name', 'pwd'))
+    """
+    上面内容的意思是，新加一列列名为c，当查询到每一行数据的时候如果name部位空，那么c这一列就为name，如果name为空，那么c就为pwd
+    """
+    # v = models.UserInfo.objects.annotate(c=Coalesce(Value('666'),'name', 'pwd'))
+
+    # 3. Concat，拼接
+    # models.UserInfo.objects.update(name=Concat('name', 'pwd'))
+    """如果要加单纯的字符串而不是字段的话需要用value渲染一下"""
+    # models.UserInfo.objects.update(name=Concat('name', Value('666')))
+    # models.UserInfo.objects.update(name=Concat('name', Value('666'),Value('999')))
+
+    # 4.ConcatPair，拼接（仅两个参数）
+    # v = models.UserInfo.objects.annotate(c=ConcatPair('name', 'pwd'))
+    # v = models.UserInfo.objects.annotate(c=ConcatPair('name', Value('666')))
+
+    # 5.Greatest，获取比较大的值;least 获取比较小的值;
+    # v = models.UserInfo.objects.annotate(c=Greatest('id', 'pwd',output_field=FloatField()))
+
+    # 6.Length，获取长度
+    # v = models.UserInfo.objects.annotate(c=Length('name'))
+
+    # 7. Lower,Upper,变大小写
+    # v = models.UserInfo.objects.annotate(c=Lower('name'))
+    # v = models.UserInfo.objects.annotate(c=Upper('name'))
+
+    # 8. Now，获取当前时间
+    # v = models.UserInfo.objects.annotate(c=Now())
+
+    # 9. substr，子序列
+    # 取name字段，第一个1是起始位置，2表示取多长的长度
+    # v = models.UserInfo.objects.annotate(c=Substr('name',1,2))
+    # 下面是在数据库实际的操作，可以使用v.query查看。
+    select *,Concat('nid','title') from table_name 
+
+    # ########### 时间类函数 ###########
+    # 1. 时间截取，不保留其他：Extract, ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,ExtractSecond, ExtractWeekDay, ExtractYear,
+    # v = models.UserInfo.objects.annotate(c=functions.ExtractYear('ctime'))
+    # v = models.UserInfo.objects.annotate(c=functions.ExtractMonth('ctime'))
+    # v = models.UserInfo.objects.annotate(c=functions.ExtractDay('ctime'))
+    #
+    # v = models.UserInfo.objects.annotate(c=functions.Extract('ctime', 'year'))
+    # v = models.UserInfo.objects.annotate(c=functions.Extract('ctime', 'month'))
+    # v = models.UserInfo.objects.annotate(c=functions.Extract('ctime', 'year_month'))
+    """
+    MICROSECOND
+    SECOND
+    MINUTE
+    HOUR
+    DAY
+    WEEK
+    MONTH
+    QUARTER
+    YEAR
+    SECOND_MICROSECOND
+    MINUTE_MICROSECOND
+    MINUTE_SECOND
+    HOUR_MICROSECOND
+    HOUR_SECOND
+    HOUR_MINUTE
+    DAY_MICROSECOND
+    DAY_SECOND
+    DAY_MINUTE
+    DAY_HOUR
+    YEAR_MONTH
+    """
+
+    # 2. 时间截图，保留其他：Trunc, TruncDate, TruncDay,TruncHour, TruncMinute, TruncMonth, TruncSecond, TruncYear
+    # v = models.UserInfo.objects.annotate(c=functions.TruncHour('ctime'))
+    # v = models.UserInfo.objects.annotate(c=functions.TruncDate('ctime'))
+    # v = models.UserInfo.objects.annotate(c=functions.Trunc('ctime','year'))
+```
+
+自定义Func
+
+```python
+from django.db.models.functions.base import Func
+class CustomFunc(Func):
+    function = 'DATE_FORMAT'
+    
+    template = '%(function)s(%(exporessions)s,%(format)s)'
+    
+    def __init__(self, expression, **extra):
+        expressions = [expression]
+        super(CustomFunc, self).__init__(*expressions, ** extra)
+        
+CustomFunc('create_time', '%Y-%m')
+# DATE_FORMAT('create_time','%Y-%m')
+```
+
+![](http://omk1n04i8.bkt.clouddn.com/18-3-6/17906939.jpg)
+
