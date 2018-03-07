@@ -328,7 +328,7 @@ pip install Pygments
 新建一个名为templatetags的Python Package，然后在目录下新建一个blog_tags.py。这个文件存放自定义的模板标签代码：
 
 ```shell
-(blog2) ➜  blog2 > tree -L 2
+(blog2) ➜  blog2 > tree . -L 2
 .
 ├── blog
 │   ├── __init__.py
@@ -337,6 +337,7 @@ pip install Pygments
 │   ├── apps.py
 │   ├── migrations
 │   ├── models.py
+│   ├── templatetags
 │   ├── tests.py
 │   ├── urls.py
 │   └── views.py
@@ -351,12 +352,18 @@ pip install Pygments
 ├── static
 │   ├── css
 │   └── js
-├── template
-│   ├── __init__.py
-│   ├── base.html
-│   └── blog
-└── templatetags
+└── template
     ├── __init__.py
-    └── blog_tags.py
+    ├── base.html
+    └── blog
+```
+
+遇到一个错误，因为没有注册新添加的文件夹：
+
+```python
+TemplateSyntaxError at /
+'blog_tags' is not a registered tag library. Must be one of:
+
+在配置文件中的INSTALLED_APP中注册一下这个就行了。
 ```
 
