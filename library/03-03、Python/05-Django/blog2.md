@@ -367,3 +367,18 @@ TemplateSyntaxError at /
 在配置文件中的INSTALLED_APP中注册一下这个就行了。
 ```
 
+
+
+根据日期进行分类的部分：
+
+```python
+这里 {% url %} 这个模板标签的作用是解析视图函数 blog:archives 对应的 URL 模式，并把 URL 模式中的年和月替换成 date.year，date.month 的值。例如 blog:archives 表示 blog 应用下的 archives 函数，这个函数对应的 URL 模式为 ^archives/(?P<year>[0-9]{4})/(?P<month>[0-9]{1,2})/$，假设 date.year=2017，date.month=5，那么 {% url 'blog:archives' date.year date.month %} 模板标签返回的值为/archives/2017/5/。
+
+为什么要使用 {% url %} 模板标签呢？事实上，我们把超链接的 href 属性设置为 /archives/{{ date.year }}/{{ date.month }}/ 同样可以达到目的，但是这种写法是硬编码的。虽然现在 blog:archives 视图函数对应的 URL 模式是这种形式，但是如果哪天这个模式改变了呢？如果使用了硬编码的写法，那你需要把每一处 /archives/{{ date.year }}/{{ date.month }}/ 修改为新的模式。但如果使用了 {% url %} 模板标签，则不用做任何修改。
+    
+需要安装pytz模块
+pip install pytz
+```
+
+## 评论模块
+
