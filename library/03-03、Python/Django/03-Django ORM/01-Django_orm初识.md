@@ -1,5 +1,7 @@
 # Django ORM
 
+> 首先针对ORM不做太对的赘述，ORM不仅仅是Python有，其他的语言也有。比较重要的就是记住其中的映射关系。类对应数据表，字段对应属性，类的对象对应表中的每一条记录。
+>
 > - 数据库操作：事先创建好数据库
 > - 数据表操作：创建表，修改表，删除表
 > - Django Query_set的链式操作
@@ -26,7 +28,6 @@ DATABASES = {
 
 # 在project同名的__init__.py中引入一下pymysql
 # 由于Django内部连接MySQL时使用的是MySQLdb模块，而python3中还无此模块，所以需要使用pymysql来代替
-  
 # 如下设置放置的与project同名的配置的 __init__.py文件中
   
 import pymysql
@@ -69,6 +70,8 @@ LOGGING = {
         },
     }
 }
+
+当然这个不一定打开，因为打开以后实在是有点烦，你可以用对象的query方法，比如print(ob.query)进行单独查看。
 ```
 
 ## 2、Django数据表的创建
@@ -83,7 +86,8 @@ django orm之创建数据表，在app的models类，创建一个类，这个类�
 # 表类创建示例
 class Userinfo(models.Model):
     # AutoField()就是自增的，在内部生成的是Int类型，还有一个BigAutoField，就是bigint
-    # 在django里，这一列可以不写，在内部会默认生成一列叫id，是int类型的，并且自增的
+    # 在django里，这一列可以不写，在内部会默认生成一列叫id，是int类型的，并且自增的，是PrimaryKey
+    # 当然这一列你写了就用你的。
     nid = models.AutoField(primary_key = True)
     # CharField就是字符串类型
     username = models.CharField(max_length=32)
@@ -91,8 +95,21 @@ class Userinfo(models.Model):
     
     
 # 表与表之间的关系：外键
+
+    
+# 表的修改
+直接修改models中的class数据模型类就行了。在已经有数据的表里添加字段的时候要添加默认值
+age = models.IntergerField(null=True)
+或者
+age = models.IntergerField(default=1)
+```
+
+表与表可以通过外键之间建立关系，但是表之间的关系Django提供了更多的处理方式
+
+```python
+# 会自动生成一个group_id_id的这么一列，生成外键的关系。也就是说我们创建的外键在实际的表中会生成一个我们创建的名字_id形式的名字字段，因此如果说向这个表中添加数据的时候，指定的字段名应该是，外键_id的形式。
 group_id = models.ForeignKey("UserGroup", null=False)
-会自动生成一个group_id_id的这么一列，生成外键的关系。也就是说我们创建的外键在实际的表中会生成一个我们创建的名字_id形式的名字字段，因此如果说向这个表中添加数据的时候，指定的字段名应该是，外键_id的形式。
+
 
 示例：
 class Userinfo(models.Model):
@@ -102,12 +119,6 @@ class Userinfo(models.Model):
     ut = models.ForeignKey('UserType', on_delete=models.CASCADE)
     
     那么结果会有id，name，age，ut_id字段，共4个字段
-    
-# 表的修改
-直接修改models中的class数据模型类就行了。在已经有数据的表里添加字段的时候要添加默认值
-age = models.IntergerField(null=True)
-或者
-age = models.IntergerField(default=1)
 ```
 
 ### 2.2、注册你的项目
