@@ -17,8 +17,12 @@
 | GenericIPAddressField(Field)          | 字符串类型，Django Admin以及ModelForm中提供验证 Ipv4和Ipv6；参数1：protocol，用于指定Ipv4或Ipv6， 'both',"ipv4","ipv6"；参数2：unpack_ipv4， 如果指定为True，则输入::ffff:192.0.2.1时候，可解析为192.0.2.1，开启此功能，需要protocol="both" |
 | FilePathField(Field)                  | 字符串，Django Admin以及ModelForm中提供读取文件夹下文件的功能。参数如下：path（文件夹路径）,match=None（正则匹配）,recursive=False（是否递归下面的文件夹）,allow_files=True（允许文件）,allow_folders=False（允许文件夹） |
 | FileField(Field)                      | 字符串，路径保存在数据库，文件上传到指定目录，可以在Django Admin中，直接进行使用。参数1：upload_to = ""表示上传文件的保存路径；参数2：storage = None表示存储组件，默认：django.core.files.storage.FileSystemStorage |
-| ImageField(FileField)                 | 字符串，路径保存在数据库，文件上传到指定的目录；参数如下：upload_to=""（表示上传文件的保存路径）；storage=None(表示存储组件，默认的是django.core.files.storage.FileSystemStorage)；width_field=None（上传图片的高度保存的数据库字段名，字符串形式）；height_field=None（ 上传图片的宽度保存的数据库字段名，字符串形式）； |
+| ImageField(FileField)                 | 字符串，路径保存在数据库，文件上传到指定的目录；参数如下：upload_to=""（表示上传文件的保存路径）；storage=None(表示存储组件，默认的是django.core.files.storage.FileSystemStorage)；width_field=None（上传图片的高度保存的数据库字段名，字符串形式）；height_field=None（ 上传图片的宽度保存的数据库字段名，字符串形式）；记得装PIL的库，不然会报错。 |
 | CommaSeparatedIntegerField(CharField) | 字符串类型，格式必须为逗号分割的数字                       |
+
+**针对上述内容进行一个简单的说明**
+
+- SlugField：Slug这个Field是用在文章的URL的，比如一个文章标题是i love django，那么可以把slug设置成`i-love-slug`，然后这样这篇文章的url可以是`www.example.com/article/i-love-django`，每一篇文章都是唯一的，所以slug也要唯一，unique要设置为True。当然你可以不这么用，单纯的用文章的id也行。
 
 ## 时间类型
 
@@ -47,8 +51,8 @@ price=models.DecimalField(max_digits=8,decimal_places=3) 精确浮点
 lover=models.IntegerField(choices=choice) #枚举类型
 
 # 在数据库存储枚举类型，比外键有什么优势？
-1、无需连表查询性能低，省硬盘空间(选项不固定时用外键)
-2、在modle文件里不能动态增加（选项一成不变用Django的choice），选项固定的时候可以使用枚举，如果需要动态增加的时候建议使用外键。
+1、无需连表查询性能高一些，省硬盘空间(选项不固定时用外键)
+2、在model文件里不能动态增加（选项一成不变用Django的choice），选项固定的时候可以使用枚举，如果需要动态增加的时候建议使用外键。
 3、在Django Admin中可以直接结合枚举生效，生成下拉框。
 ```
 
@@ -134,7 +138,7 @@ admin.site.register(models.DjangoAdmin_test)
   gf = models.IntegerField(choices=[(0, '何穗'),(1, '大表姐'),],default=1)
   ```
 
-- verbose_name：Admin中显示的字段名称
+- verbose_name：Admin中显示的字段名称，或者说使用model组件的时候显示的名称
 
 - blank：Admin中是否允许用户输入为空。
 

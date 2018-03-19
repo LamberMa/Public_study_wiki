@@ -1,5 +1,42 @@
 ## 3、Django数据操作
 
+## 模型之间的关系
+
+> 先来简单说明模型之间的关系，大致可以分为三种，一对一，一对多，多对多。
+
+### 一对一
+
+
+
+### 一对多
+
+
+
+### 多对多
+
+> 比如一个老师可以任教多个班级，一个班级可以被多个老师任教，这就是一个多对多的关系
+
+```python
+class Class(models.Model):
+    name = models.CharField(max_length=32, verbose_name="班级名")
+    course = models.CharField(verbose_name="课程", max_length=32)
+
+    def __str__(self):
+        return self.name
+
+
+class Teacher(models.Model):
+    name = models.CharField(max_length=23, verbose_name="姓名")
+    classes = models.ManyToManyField(verbose_name="所属班级", to="Class")
+
+    def __str__(self):
+        return self.name
+```
+
+针对多对多的关系就可以直接使用ManyToManyField进行声明。Django会为我们分别生成appname_class和appname_teacher这两个表，其中appname指的是你的app的名称。但是并不会在你的teacher的表中生成classes这么一个字段，而是单独的为你创建一个class和teacher的关系表。
+
+不过这个m2m的表只会为你创建三个字段，一个id，还有两个字段分别关联到class的主键字段和teacher的主键字段，如果我们还有其他的需求的话，这个Django默认是无法为我们完成的。因此这个表我们也可以自己进行定义的。
+
 ### 3.1、增&删&改
 
 针对于增删改来讲，相对来说是很简单的，

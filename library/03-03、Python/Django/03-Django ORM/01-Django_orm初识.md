@@ -93,10 +93,6 @@ class Userinfo(models.Model):
     username = models.CharField(max_length=32)
     password = models.CharField(max_length=64)
     
-    
-# 表与表之间的关系：外键
-
-    
 # 表的修改
 直接修改models中的class数据模型类就行了。在已经有数据的表里添加字段的时候要添加默认值
 age = models.IntergerField(null=True)
@@ -107,9 +103,9 @@ age = models.IntergerField(default=1)
 表与表可以通过外键之间建立关系，但是表之间的关系Django提供了更多的处理方式
 
 ```python
-# 会自动生成一个group_id_id的这么一列，生成外键的关系。也就是说我们创建的外键在实际的表中会生成一个我们创建的名字_id形式的名字字段，因此如果说向这个表中添加数据的时候，指定的字段名应该是，外键_id的形式。
+# 下面这条命令是和UserGroup进行建立关系，关系建立后并不会在当前的表生成一个叫group_id的字段而是会
+# 自动生成一个group_id_id的这么一列，生成外键的关系。也就是说我们创建的外键在实际的表中会生成一个我们创建# 的名字_id形式的名字字段，因此如果说向这个表中添加数据的时候，指定的字段名应该是，外键_id的形式。
 group_id = models.ForeignKey("UserGroup", null=False)
-
 
 示例：
 class Userinfo(models.Model):
@@ -141,7 +137,7 @@ INSTALLED_APPS = [
 ```python
 # 最后创建数据库表
 python manage.py makemigrations  # 生成配置文件
-# 通过配置文件进行操作数据库，每一次都有一个配置文件，保存在app中的migrations文件夹中，修改的依据也是这个文件夹的操作配置的记录的配置文件。
+# 通过配置文件进行操作数据库，每一次都有一个配置文件，保存在app中的migrations文件夹中，修改的依据也是这个文件夹的操作配置的记录的配置文件。我们其实可以理解为一个数据库修改操作的记录表
 python manage.py migrate         
 
 # django自己会创建很多表
@@ -163,7 +159,9 @@ mysql> show tables;
 +----------------------------+
 11 rows in set (0.00 sec)
 
-只有这个backend_userinfo才是我们自己的表，其他的都是django默认创建的。
+# 只有这个backend_userinfo才是我们自己的表，其他的都是django默认创建的。
+# Django通过自身的ORM为我们生成的表名默认是以appname_小写的类名。
+# 比如app名称是backend，那么对应的class UserInfo这个类生成的orm就是：backend_userinfo
 ```
 
 ## 3、Django Admin
@@ -183,4 +181,26 @@ python3 manage.py createsuperuser
 主界面：
 
 ![](http://omk1n04i8.bkt.clouddn.com/18-1-31/37524661.jpg)
+
+假如说Django Admin的密码忘了怎么办？
+
+```python
+python manage.py changepassword <username>
+```
+
+通过Django Admin注册model实现数据插入：
+
+```python
+# 在对应的app的admin.py下引入models模块进行注册
+from django.contrib import admin
+from main import models
+
+# Register your models here.
+admin.site.register(models.Article)
+admin.site.register(models.Category)
+admin.site.register(models.Tag)
+admin.site.register(models.User)
+```
+
+再访问admin界面的时候我们就可以使用Django Admin进行数据添加了。
 
