@@ -2,7 +2,9 @@
 
 >Django Models内置了很多建表的类型，灵活的使用Django提供的数据类型可以让我们的工作事半功倍。
 
-## 字符串类型
+## 不同类型的内置Model
+
+### 字符串类型
 
 下面这些其实本质上来说都是字符串的类型（对应的mysql的类型就是varchar类型）：
 
@@ -23,27 +25,61 @@
 **针对上述内容进行一个简单的说明**
 
 - SlugField：Slug这个Field是用在文章的URL的，比如一个文章标题是i love django，那么可以把slug设置成`i-love-slug`，然后这样这篇文章的url可以是`www.example.com/article/i-love-django`，每一篇文章都是唯一的，所以slug也要唯一，unique要设置为True。当然你可以不这么用，单纯的用文章的id也行。
+- 关于ImageField(FileField)，这个字段依赖于PIL库，因此确保你使用的时候安装了这个库，如果没有安装的话可以使用pip安装一下：`pip install PIL`否则是会报错的哦~
 
-## 时间类型
+### 时间类型
 
 ```python
 models.DateTimeField(null=True)
 date=models.DateField()
 ```
 
-## 数字类型
+关于时间类型，Django提供的model有DateTimeField，DateField，TimeField三种类型。分别对应的datetime()，date()，time()三种对象。这三个field有相同的参数，一个事auto_now，一个是auto_now_add。
+
+- auto_now：这个字段属性值默认是false的，在保存数据对象的时候，将其设置为当前时间，然后当你修改的时候这个时间会随着你修改的时间变化而变化。简单来说，这个对象的时间会一直是最新的时间，你没办法为这个字段进行手动的赋值。
+- auto_now_add：这个字段默认也是false的，如果设置为True以后其实和auto_now差不多，只不过这个时间不会因为你后续的修改而进行改变，而是只保存第一次创建的时间。比如说用户创建时间，这个不应该随着用户信息变化而发生改变，但是论坛发的帖子，可以有一个最后的修改时间可以随着修改而改变。
+
+auto_now和auto_now_add被设置为True后，这样做会导致字段成为editable=False和blank=True的状态。editable=False将导致字段不会被呈现在admin中，blank=True表示允许在表单中不输入值。此时，如果在admin的fields或fieldset中强行加入该日期时间字段，那么程序会报错，admin无法打开；如果在admin中修改对象时，想要看到日期和时间，可以将日期时间字段添加到admin类的readonly_fields中：
 
 ```python
-(max_digits=30,decimal_places=10)总长度30小数位 10位）
+class YourAdmin(admin.ModelAdmin):
+    readonly_fields = ('save_date', 'mod_date',)
+admin.site.register(Tag, YourAdmin)
+```
+
+实际场景中，往往既希望在对象的创建时间默认被设置为当前值，又希望能在日后修改它。怎么实现这种需求呢？
+
+django中所有的model字段都拥有一个default参数，用来给字段设置默认值。可以用default=timezone.now来替换auto_now=True或auto_now_add=True。timezone.now对应着django.utils.timezone.now()，因此需要写成类似下面的形式：
+
+```python
+from django.db import models
+import django.utils.timezone as timezone
+class Doc(models.Model):
+    add_date = models.DateTimeField('保存日期',default = timezone.now)
+    mod_date = models.DateTimeField('最后修改日期', auto_now = True)
+```
+
+html页面从数据库中读出DateTimeField字段时，显示的时间格式和数据库中存放的格式不一致，比如数据库字段内容为2016-06-03 13:00:00，但是页面显示的却是Apr. 03, 2016, 1 p.m.
+
+为了页面和数据库中显示一致，需要在页面格式化时间，需要添加如下类似的过滤器。刷新页面，即可正常显示。
+
+```python
+<td>{{ **infor.updatetime|date:"Y-m-d H:i:s" **}}</td>
+```
+
+### 数字类型
+
+```python
+# (max_digits=30,decimal_places=10)总长度30-小数位10位）
 num = models.IntegerField()
 num = models.FloatField() 浮点
 price=models.DecimalField(max_digits=8,decimal_places=3) 精确浮点
 ```
 
-## 枚举
+### 枚举
 
 ```python
- choice=(
+choice=(
         (1,'male'),
         (2,'female'),
         (3,'other')
@@ -56,7 +92,7 @@ lover=models.IntegerField(choices=choice) #枚举类型
 3、在Django Admin中可以直接结合枚举生效，生成下拉框。
 ```
 
-## 其他参数
+### 其他参数
 
 ```python
 # 字段参数
