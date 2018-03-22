@@ -154,9 +154,6 @@
     - [Django开篇](?file=03-03、Python/05-Django/02-Django开篇 "Django开篇")
     - **Django ORM**
         - [Django_orm初识](?file=03-03、Python/05-Django/03-Django ORM/01-Django_orm初识 "Django_orm初识")
-        - [Django_Models](?file=03-03、Python/05-Django/03-Django ORM/02-Django_Models "Django_Models")
-        - [ORM数据操作](?file=03-03、Python/05-Django/03-Django ORM/03-ORM数据操作 "ORM数据操作")
-        - [备用资料](?file=03-03、Python/05-Django/03-Django ORM/04-备用资料 "备用资料")
     - [Django模板](?file=03-03、Python/05-Django/04-Django模板 "Django模板")
     - [Cookie和Session](?file=03-03、Python/05-Django/05-Cookie和Session "Cookie和Session")
     - [Django安全](?file=03-03、Python/05-Django/06-Django安全 "Django安全")
@@ -188,6 +185,8 @@
         - [Python的数据类型](?file=03-03、Python/12-扩展阅读/03-流畅的Python读书笔记/00-Python的数据类型 "Python的数据类型")
     - **Python CookBook**
         - [01、数据结构和算法](?file=03-03、Python/12-扩展阅读/04-Python CookBook/01-01、数据结构和算法 "01、数据结构和算法")
+    - **Django_By_Example**
+        - [Chapter1](?file=03-03、Python/12-扩展阅读/05-Django_By_Example/01-Chapter1 "Chapter1")
 - [Python代码风格（PEP8）](?file=03-03、Python/98-Python代码风格（PEP8） "Python代码风格（PEP8）")
 - [Python报错统计](?file=03-03、Python/99-Python报错统计 "Python报错统计")
 
@@ -207,6 +206,7 @@
     - [04、CSS简单了解](?file=06-06、有趣的前端/01-01-HTML快速入门/04-04、CSS简单了解 "04、CSS简单了解")
     - [05、CSS盒模型](?file=06-06、有趣的前端/01-01-HTML快速入门/05-05、CSS盒模型 "05、CSS盒模型")
     - [06、浮动和定位](?file=06-06、有趣的前端/01-01-HTML快速入门/06-06、浮动和定位 "06、浮动和定位")
+    - [07、BootStrap](?file=06-06、有趣的前端/01-01-HTML快速入门/07-07、BootStrap "07、BootStrap")
     - [10、常见样式布局](?file=06-06、有趣的前端/01-01-HTML快速入门/10-10、常见样式布局 "10、常见样式布局")
 - **02-JavaScript**
     - **JS入门**
