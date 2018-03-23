@@ -154,6 +154,7 @@
     - [Django开篇](?file=03-03、Python/05-Django/02-Django开篇 "Django开篇")
     - **Django ORM**
         - [Django_orm初识](?file=03-03、Python/05-Django/03-Django ORM/01-Django_orm初识 "Django_orm初识")
+        - [Django Model](?file=03-03、Python/05-Django/03-Django ORM/02-Django Model "Django Model")
     - [Django模板](?file=03-03、Python/05-Django/04-Django模板 "Django模板")
     - [Cookie和Session](?file=03-03、Python/05-Django/05-Cookie和Session "Cookie和Session")
     - [Django安全](?file=03-03、Python/05-Django/06-Django安全 "Django安全")
