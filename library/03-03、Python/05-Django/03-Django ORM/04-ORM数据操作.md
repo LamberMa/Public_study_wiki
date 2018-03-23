@@ -73,6 +73,8 @@ ret = models.UserInfo.objects.all().iterator()
 
 ### 带条件的查询：
 
+如果没查到数据的话会返回一个空的Query_set（列表）
+
 ```python
 # where条件，条件之间默认是and关系，下面这个就是相当于where id=1 and title='xx'
 ret = models.UserGroup.objects.filter(id=1,title=xx)
