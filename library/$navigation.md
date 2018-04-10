@@ -164,10 +164,6 @@
         - [高级配置文件设计](?file=05-Python/09-项目/01-01、CMDB/02-高级配置文件设计 "高级配置文件设计")
         - [可插拔式插件的设计](?file=05-Python/09-项目/01-01、CMDB/03-可插拔式插件的设计 "可插拔式插件的设计")
     - **02、CRM**
-- **天然轮子**
-    - [01、Python_Mysql读写](?file=05-Python/10-天然轮子/01-01、Python_Mysql读写 "01、Python_Mysql读写")
-    - [02、Python_生成二维码](?file=05-Python/10-天然轮子/02-02、Python_生成二维码 "02、Python_生成二维码")
-    - **轮子库**
 - **最佳实践**
     - [001-使用YAML作为项目的配置](?file=05-Python/11-最佳实践/001-001-使用YAML作为项目的配置 "001-使用YAML作为项目的配置")
     - [002-VirtualEnv](?file=05-Python/11-最佳实践/002-002-VirtualEnv "002-VirtualEnv")
@@ -200,6 +196,9 @@
 - [Django模板](?file=06-Django/07-Django模板 "Django模板")
 - [Cookie和Session](?file=06-Django/08-Cookie和Session "Cookie和Session")
 - [Django安全](?file=06-Django/09-Django安全 "Django安全")
+- **Django Blog**
+    - **登录&注册**
+        - [验证码](?file=06-Django/98-Django Blog/04-登录&注册/04-验证码 "验证码")
 - [Django常见小问题](?file=06-Django/99-Django常见小问题 "Django常见小问题")
 
 ##### Flask
@@ -248,3 +247,12 @@
 - **软件使用篇**
     - [Virtualbox添加网卡](?file=13-MacBook/03-软件使用篇/01-Virtualbox添加网卡 "Virtualbox添加网卡")
     - [通过Vagrant管理vbox虚拟机](?file=13-MacBook/03-软件使用篇/02-通过Vagrant管理vbox虚拟机 "通过Vagrant管理vbox虚拟机")
+
+##### 天然轮子
+- **Go**
+- **Python**
+    - [01、Python_Mysql读写](?file=14-天然轮子/02-Python/01-01、Python_Mysql读写 "01、Python_Mysql读写")
+    - [02、Python_生成二维码](?file=14-天然轮子/02-Python/02-02、Python_生成二维码 "02、Python_生成二维码")
+
+##### Go
+- [Go开发环境搭建](?file=15-Go/01-Go开发环境搭建 "Go开发环境搭建")
