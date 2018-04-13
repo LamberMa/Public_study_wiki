@@ -69,7 +69,7 @@ a. void open(String method,String url,Boolen async)
 如果是非异步，那么后台处理期间，整个页面就被卡主了。当后面的代码用到了前面的内容的时候就应该使用同步的。
 
 b. void send(String body)
-    用于发送请求
+    用于发送请求，向请求体里塞内容
 
     参数：
         body： 要发送的数据（字符串类型）
@@ -164,6 +164,7 @@ function add2(){
   # 打开一个连接，是否异步不写默认就是异步的
   xhr.open('POST','/add2/');
   # POST请求的时候要记得设置Content-Type请求头，申明发送的数据类型。告诉后端我提交的数据是二进制编码的数据。并且post不存在get方法提交时候的缓存问题。所以也无需关系，而且编码问题也无需关心。
+  # 不设置请求头的话会返回一个空字典
   xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
   # 把数据放到send的参数中，用于发送请求，无需编码
   xhr.send('i1=12&i2=23');
@@ -210,70 +211,7 @@ function ajax(method, url, data, success){
 }
 ```
 
-## 伪ajax
-
-> 从iframe标签说起：iframe标签可以伪造出局部刷新的效果。可以开辟一个类似向后台提交的通道。不刷新，发送HTTP请求。`<form>`标签可以把input的数据打包，因此这俩结合起来也可以实现不刷新向后台提交数据的功能。iframe相当于又嵌套了一个页面。
-
-```html
-<body>
-  <input type='text' />
-  <!--使用target可以指定提交的方式，不用form原来的提交方式了。-->
-  <form method='post' action='/fake_ajax/' target="ifr">
-    <!--这个iframe放哪其实无碍-->
-    <iframe name="ifr" style='display:none'></iframe>
-    <input type="text" name="user" />
-    <input type="submit" value="提交" />
-  </form>
-</body>
-```
-
-这种情况下是无法使用回调函数的。后台返回的值会放到iframe中去。那么其实可以这样，只要iframe中有内容的时候，证明后台的值就返回来了。如果里面有内容了，是可以执行一个onload函数的。这个onload也适用于其他的标签，只要加载的时候就会执行这个onload，后台返回一次数据就会加载一次。
-
-```html
-<body>
-  <input type='text' />
-  <!--使用target可以指定提交的方式，不用form原来的提交方式了。-->
-  <form method='post' action='/fake_ajax/' target="ifr">
-    <!--这个iframe放哪其实无碍-->
-    <iframe name="ifr" onload="loadIframe();"></iframe>
-    <input type="text" name="user" />
-    <input type="submit" value="提交" />
-  </form>
-  <script>
-    function loadIframe(){
-      alert(123);
-    }
-  </script>
-</body>
-```
-
-但是这个会出现一个问题，console会报错，html从上往下加载第一次执行到iframe的时候回进行加载，但是此时js脚本还没有读到呢，因此会报错，说loadIframe找不到。为了避免这个问题：
-
-```html
-<body>
-  <input type='text' />
-  <!--使用target可以指定提交的方式，不用form原来的提交方式了。-->
-  <form id="f1" method='post' action='/fake_ajax/' target="ifr">
-    <!--这个iframe放哪其实无碍-->
-    <iframe name="ifr"  id='ifr' style='display:none'></iframe>
-    <input type="text" name="user" />
-    <a onclick="submitForm();">提交</a>
-  </form>
-  <script>
-    # 通过js代码提交表单，可以在提交的时候再绑定事件。
-    function submitForm(){
-      document.getElementById('f1').submit();
-      # 在点的时候才绑定事件，第一遍读取的时候并不绑定事件。
-      document.getElementById('ifr').onload=loadIframe();
-    }
-    function loadIframe(){
-      # 取iframe中的数据要用contentWindow取内容。
-      var content = document.getElementById('ifr').contentWindow.document.body.innerText;
-      alert('content')
-    }
-  </script>
-</body>
-```
+## Ajax上传文件
 
 上面的这些都是发送的文字，接下来来看如何使用ajax在后台上传文件。
 
@@ -283,20 +221,24 @@ function upload(){
   var formData = new FormData();
   # 字符串
   formData.append('k1','v1')
-  # 拿到文件对象，i1为input的type为file的标签的id，它下面有一个files，拿到的是
+  # 拿到文件对象，i1为input的type为file的标签的id，它下面有一个files属性值，拿到的是
   # 一个文件对象的列表，因为有可能上传多个文件，我们取第一个就是索引0的位置
   formData.append('fafafa',document.getElementById('i1').files[0])
   var xhr = new XMLHttpRequest();
   xhr.onreadystateChange = function(){
     if (xhr.readyState == 4){
+      # 定一个变量用来获取后端传递过来的file_path
       var file_path = xhr.responsetext;
       var tag = document.createElement('img');
+      # 返回的路径是相对的，我们要加一个斜杠，要这个路径是针对根显示的。
       tag.src = "/" + file_path;
+      # container是页面中的一个容器，我们往这个容器里添加内容
       document.getElementById('container1').appendChild(tag);
     }
   }
   xhr.open('POST','/add2/');
-  xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+  # 当使用formdata这个特殊对象的时候就不用指定这个content-type头了，直接把整个form-data对象传递到后台，后台会做统一处理。因此这个设置请求头的操作要省略。
+  # xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
   # 用于发送请求，将formData对象放到这里，formData里既有普通的文本又有文件
   xhr.send(formData);
 }
@@ -306,7 +248,9 @@ def upload(request):
   if request.method == "GET":
     return render(xxx)
   else:
+    # request.POST拿传递过来的文本数据
     file_obj = request.FILES.get('fafafa')
+    # 将上传过来的文件一点一点的写到本地
     file_path = os.path.join("static",file_obj.name)
     with open(file_path, 'wb') as f:
       for chunk in file_obj.chunks():
@@ -324,12 +268,11 @@ function upload2(){
   formData.append('fafafa',$('#i2')[0].files[0]);
   # jquery对象和Dom对象的互换，直接把dom对象加个$(dom对象)就变成jquery对象
   # 把jquery对象加个0的索引就能转换成dom对象，比如$('#i2')[0]
-  $('#i2')
   $.ajax({
     url:'/upload/',
     type:'POST',
     data:formData,
-    # 告诉jquery不要添加Content-Type，让jquery不做处理。
+    # 在原生ajax中我们知道不需要指定content-type，在这里同样也要告诉jquery不要添加Content-Type，让jquery不做处理。需要设置如下的两个参数。
     contentType:false,
     processData:false
     success:function(arg){
@@ -341,10 +284,14 @@ function upload2(){
 }
 ```
 
+### Ajax上传的兼容性处理
+
+> 通过伪造的Ajax来实现，也就是iframe的实现方案。
+
 FormData对象是html5以后提出来的这么一个对象，主流的浏览器和ie10以上都是可以使用的，但是针对以前的浏览器就会有问题。因此兼容性存在一定的问题，如果想要兼容性更好一些，可以使用伪造的Ajax。
 
 ```javascript
-# html:
+# html:务必要指定enctype为multipart/form-data
 <form id="f1" method="POST" action="/upload/" target='ifr' enctype="multipart/form-data">
   <iframe id='ifr' name='ifr' style='display:none'></iframe>
   <input type="file" name="fafafa" />
@@ -366,10 +313,5 @@ function loadIframe(){
 总结：
 
 1. 上传文件，推荐使用伪造的。
-2. 上传数据，推荐有限使用jQuery，如果不允许使用jQuery可以使用XMLHttpRequest。
-3. 不要被好看的上传按钮所迷惑
-
-上传按钮，做一个分层，把默认按钮的透明度调成是0，把自己做的放到底层。
-
-hidefocus = True
-
+2. 上传数据，推荐有限使用jQuery，而且可以打包整体发送过去。如果不允许使用jQuery可以使用XMLHttpRequest。
+3. 不要被好看的上传按钮所迷惑，好看的上传按钮就是一个定位，然后把input框透明度设置为0而已。这样点击好看的上传按钮其实就是点击这个input框上传。
