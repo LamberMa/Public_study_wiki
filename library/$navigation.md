@@ -197,8 +197,11 @@
 - [Cookie和Session](?file=06-Django/08-Cookie和Session "Cookie和Session")
 - [Django安全](?file=06-Django/09-Django安全 "Django安全")
 - **Django Blog**
-    - **登录&注册**
-        - [验证码](?file=06-Django/98-Django Blog/04-登录&注册/04-验证码 "验证码")
+    - [需求分析&DB设计](?file=06-Django/98-Django Blog/01-需求分析&DB设计 "需求分析&DB设计")
+    - [首页](?file=06-Django/98-Django Blog/02-首页 "首页")
+    - [文件的上传](?file=06-Django/98-Django Blog/08-文件的上传 "文件的上传")
+    - [验证码](?file=06-Django/98-Django Blog/09-验证码 "验证码")
+    - [上传头像](?file=06-Django/98-Django Blog/10-上传头像 "上传头像")
 - [Django常见小问题](?file=06-Django/99-Django常见小问题 "Django常见小问题")
 
 ##### Flask
@@ -227,6 +230,9 @@
         - [02、ECMA对象](?file=10-前端/03-原生JS/01-JS入门/02-02、ECMA对象 "02、ECMA对象")
 - **Jquery**
 - **Ajax**
+    - [Ajax入门](?file=10-前端/05-Ajax/01-Ajax入门 "Ajax入门")
+    - [伪造ajax](?file=10-前端/05-Ajax/02-伪造ajax "伪造ajax")
+    - [跨域Ajax](?file=10-前端/05-Ajax/03-跨域Ajax "跨域Ajax")
 - **Vue**
 - **Webpack**
 
@@ -256,3 +262,6 @@
 
 ##### Go
 - [Go开发环境搭建](?file=15-Go/01-Go开发环境搭建 "Go开发环境搭建")
+
+##### RaspBerry
+- [参考资料](?file=16-RaspBerry/01-参考资料 "参考资料")
