@@ -721,7 +721,7 @@ function func1(a,b){
 
     func1(1,2);  //3
     func1(1,2,3);//3
-    func1(1);    //NaN
+    func1(1);    //NaN，相当于1+undifined，一个数字加一个undefined。
     func1();     //NaN
 
     //只要函数名写对即可,参数怎么填都不报错.
@@ -780,11 +780,6 @@ function add(a,b){
 **匿名函数**
 
 ```javascript
-// 匿名函数
-    var func = function(arg){
-        return "tony";
-    }
-
 // 匿名函数的应用
     (function(){
         alert("tony");

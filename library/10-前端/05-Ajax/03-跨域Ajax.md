@@ -100,7 +100,7 @@ def users(request):
 
 JSONP的要求：
 
-- 客户端和服务端要达成一致。
+- 客户端和服务端要达成一致。或者对返回的数据进行数据分析然后采取相应的方式进行处理
 - 在客户端的URL中要加一个?funcname=xxxx
 - 在客户端要有一个和funcname同名的函数
 - 服务端要获取funcname
@@ -290,4 +290,81 @@ Interview
 
 
 不同的数据接口返回的数据使用不同的方式去处理。
+
+
+
+豆瓣Ajax请求
+
+```
+api.douban.com/book/subjects?q=javascript&alt=xd&cb=fn1
+```
+
+JSONP豆瓣实例
+
+```javascript
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<style>
+#q {width: 300px; height: 30px; padding: 5px; border:1px solid #f90; font-size: 16px;}
+dl {border-bottom: 1px dotted #000;}
+dt {font-weight: bold;}
+</style>
+<script>
+function fn1(data) {
+
+	var oMsg = document.getElementById('msg');
+	var oList = document.getElementById('list');
+	
+	console.log(data);
+	
+	oMsg.innerHTML = data.title.$t + ' : ' + data['opensearch:totalResults'].$t;
+	
+	var aEntry = data.entry;
+	var html = '';
+	for (var i=0; i<aEntry.length; i++) {
+		
+		html += '<dl><dt>'+ aEntry[i].title.$t +'</dt><dd><img src="'+ aEntry[i].link[2]['@href'] +'" /></dd></dl>';
+		
+	}
+	
+	oList.innerHTML = html;
+	
+}
+window.onload = function() {
+	
+	var oQ = document.getElementById('q');
+	var oBtn = document.getElementById('btn');
+	var oMsg = document.getElementById('msg');
+	var oList = document.getElementById('list');
+	
+	oBtn.onclick = function() {
+
+		if ( oQ.value != '' ) {
+			var oScript = document.createElement('script');
+			oScript.src = 'http://api.douban.com/book/subjects?q='+oQ.value+'&alt=xd&callback=fn1';
+			document.body.appendChild(oScript);
+		}
+		
+		//http://api.douban.com/book/subjects?q='+oQ.value+'&alt=xd&callback=fn1&start-index=(当前页*每页显示的条数)&max-results=10(每页显示的条数)
+		
+	}
+	
+}
+</script>
+</head>
+
+<body>
+	http://www.douban.com/service/apidoc/reference/
+	<input type="text" id="q" /><input type="button" id="btn" value="搜索" />
+    <p id="msg"></p>
+    <hr />
+	<div id="list"></div>
+</body>
+</html>
+```
+
+
 
