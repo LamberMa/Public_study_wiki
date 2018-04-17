@@ -226,8 +226,7 @@
     - **CSS框架**
         - [07、BootStrap](?file=10-前端/02-CSS/99-CSS框架/07-07、BootStrap "07、BootStrap")
 - **原生JS**
-    - **JS入门**
-        - [02、ECMA对象](?file=10-前端/03-原生JS/01-JS入门/02-02、ECMA对象 "02、ECMA对象")
+    - [ECMA对象](?file=10-前端/03-原生JS/01-ECMA对象 "ECMA对象")
 - **Jquery**
 - **Ajax**
     - [Ajax入门](?file=10-前端/05-Ajax/01-Ajax入门 "Ajax入门")

@@ -1,6 +1,10 @@
 # 跨域的Ajax JSONP
 
 >JSONP（json with padding）是一种技巧和一种技术，或者叫一种访问方式。
+>
+>同源策略参考：http://www.ruanyifeng.com/blog/2016/04/same-origin-policy.html
+>
+>https://www.cnblogs.com/rockmadman/p/6836834.html
 
 ## 跨域的问题
 
@@ -98,6 +102,8 @@ def users(request):
     return HttpResponse(temp)
 ```
 
+js中尽量少用全局变量，因此为了避免这个问题使用callback回调函数，而不是使用返回全局变量。
+
 JSONP的要求：
 
 - 客户端和服务端要达成一致。或者对返回的数据进行数据分析然后采取相应的方式进行处理
@@ -129,6 +135,8 @@ function bbb(arg){
   console.log(arg)
 }
 ```
+
+JSONP只能发get请求，因此jquery中的ajax不写type也是可以的。
 
 使用：
 
@@ -166,11 +174,11 @@ def new_users(request):
   return obj
 ```
 
-简单请求就是发过来加个响应头，如果是内部请求，会发两次请求，有一个预检的过程。
+简单请求就是发过来加个响应头，如果是内部（复杂）请求，会发两次请求，有一个预检的过程。
 
 ![](http://omk1n04i8.bkt.clouddn.com/18-2-27/24003776.jpg)
 
-
+如何区分复杂请求和简单请求，见博客。
 
 
 
