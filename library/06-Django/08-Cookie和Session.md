@@ -322,42 +322,7 @@ class Comment(models.Model):
 
 一般情况下的自关联是用不到的。
 
-## 中间件
 
-用户请求到达视图函数之前还隔着一层中间件：
-
-```python
-# Django的Settings文件。
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-```
-
-对应到Django中其实就是一个个的类，请求进来是一套方法，请求返回又是一套方法。在每一层中间件的时候如果遇到了错误，就不会继续执行了而是直接返回，根本到达不了视图函数。比如我们在这里做一个黑名单的功能，拦下一些ip地址。
-
-```python
-# 自定义中间件
-from django.utils.deprecation import MiddlewareMixin
-
-
-class M1(MiddlewareMixin):
-    def process_request(self, request):
- 		pass
-    
-    def process_response(self, request, response):
-        # 在response的时候要返回给下一个中间件
-        # request不用return，因为django内部帮忙操作了。添上反而有问题。
-        # 你如果在request部分返回值，中间件就不继续往下执行了。
-        return response
-```
-
-在配置文件中，中间件是一个有序列表，因此中间件也是按照顺序进行执行的。
 
 Django:
 
@@ -390,60 +355,3 @@ django默认使用的wsgi是wsgiref
 
 
 mvc & mtv(models（模型类）, templates（模板）,views（业务逻辑）)
-
-
-
-
-
-中间件：
-
-- 类
-  - process_request：django为你做了返回，如果自己添加的话中间件不会进一步运行
-  - process_response：需要有一个返回值
-- 注册中间件
-
-旧版本的1.10之前的Django，如果request我们人工返回了值会从中间件的最后一个response返回而不是从当前的中间件的response返回：
-
-![](http://omk1n04i8.bkt.clouddn.com/18-2-22/64902081.jpg)
-
-不过最新的已经不是这么个流程了。
-
-中间件除了request和response外还有一个process_view方法
-
-```python
-def process_view(self, request, callback, callback_args, callback_kwargs):
-    pass
-
-callback是路由匹配对应的url函数的函数名。
-```
-
-![](http://omk1n04i8.bkt.clouddn.com/18-2-22/30380835.jpg)
-
-因此在这个折返的过程中就允许我主动调用视图函数了。
-
-![](http://omk1n04i8.bkt.clouddn.com/18-2-22/14622746.jpg)
-
-process_view中如果有返回值的话，会跳过视图函数把所有的response执行一遍返回去，和request多少有一点不一样。
-
-![](http://omk1n04i8.bkt.clouddn.com/18-2-22/189029.jpg)
-
-- process_exception
-
-这个方法会捕获视图函数中的错误，执行流程如下：
-
-![](http://omk1n04i8.bkt.clouddn.com/18-2-22/10960222.jpg)
-
-就像一个鸡爪或者两个闪电~
-
-exception一旦有了返回值就不会往下继续执行了，也就是谁把错误处理了以后就不会继续往下执行了。
-
-- process_template_response(self, request, response)
-
-针对视图函数的返回值做一个要求，如果有render方法才会被调用。
-
-
-
-到底什么时候开始应用中间件：
-
-- 适用于对所有请求或者一部分请求做批量处理。
-- 可以应用于请求做判断进行缓存应用的处理。

@@ -21,7 +21,7 @@
 - 慎用safe和mark_safe
 - 非要用，那务必过滤关键字。
 
-## CSRF（跨站请求的伪造）【需要视频复盘】
+## CSRF（跨站请求的伪造）
 
 > django为用户实现防止跨站请求伪造的功能，通过中间件 django.middleware.csrf.CsrfViewMiddleware 来完成。而对于django中设置防跨站请求伪造功能有分为全局和局部。
 >
@@ -59,7 +59,7 @@ from django.views import View
 
 # 装饰器是CBV中是不可以直接使用的，要调用Django提供的方法才行。
 @method_decorator(csrf_protect) # 给类下的所有绑定方法加装饰器
-# @method_decorator(csrf_protect, name='post') # 给类下的post方法加装饰器，name是谁就是给谁装饰
+# @method_decorator(csrf_protect, name='post') # 给类下的post方法加装饰器，name是谁就是给谁装饰,可以写多个，写多行就行了，多个装饰器。
 class Foo(View):
     def get(self, request):
         pass
@@ -73,7 +73,7 @@ class Foo(View):
 # 如果是给dispatch加这个装饰器的话也相当于给所有的加了，因为dispatch是一个入口函数，有dispatch的时候是优先找到dispatch然后通过反射找的POST或者GET方法。
 @method_decorator(csrf_protect, name='dispatch')
 
-# 针对CSRF的装饰器只能给CBV的类加，不能给类下的方法加，我们自己自定义的装饰器应该是ok的
+# 针对CSRF的装饰器只能给CBV的类加，不能给CBV类下的方法加，这是csrf种一个比较变态的规定。我们自己自定义的装饰器应该是ok的
 ```
 
 ### 应用
@@ -127,7 +127,13 @@ text.html
     <script src="/static/plugin/jquery/jquery-1.8.0.js"></script>
     <script src="/static/plugin/jquery/jquery.cookie.js"></script>
     <script type="text/javascript">
+        // var csrftoekn = $('input[name="csrfmiddlewaretoken"]').val()
         var csrftoken = $.cookie('csrftoken');
+        // 不仅如此还可以用这个插件设置cookie
+        // $.cookie('key','value')
+        // 这样document.cookie就会发现多了一个。
+        // 一个是在请求头，一个是在data中带，注意cookie和csrfmiddlewaretoken中的值是不一样的
+        // 在请求体中设置csrfmiddletoken设置为{{ csrf_token }}这样取直接就行。
   
         function csrfSafeMethod(method) {
             // these HTTP methods do not require CSRF protection
