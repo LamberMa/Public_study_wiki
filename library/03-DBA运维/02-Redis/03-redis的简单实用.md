@@ -137,7 +137,7 @@ OK
 > - 位上限2^(9+10+10+3)=2^32b
 
 ```shell
-# 设置某一位上的值，offset表示偏移量，从0开始，value不写，默认是0
+# 设置某一位上的值，offset表示偏移量，从0开始，0是最右侧的那个，比如01001011，第0个为1
 setbit key offset value、
 # 获取某一位上的值
 getbit key offset
@@ -145,7 +145,90 @@ getbit key offset
 bitpos key bit [start] [end]
 ```
 
+位操作
 
+```shell
+# 对一个或者多个保存二进制的字符串key进行位元操作，并将结果保存到destkey上
+# operation可以使AND OR NOT XOR这四种操作的一种。
+# 除了not操作之外，其他操作都可以接受一个或者多个key作为输入
+# 当bitop处理不同长度的字符串的时候，较短的字符串所缺少的部分会被看做是0
+# 空的key也被看做是包含0的字符串序列
+
+# 对一个或多个key求逻辑与，并将结果保存到destkey
+bitop and destkey key [key....] 
+
+# 对一个或多个key求逻辑或，并将结果保存到destkey
+bitop or destkey key [key....] 
+
+# 对一个或多个key求逻辑异或，并将结果保存到destkey
+bitop xor destkey key [key....]
+
+# 对一个或多个key求逻辑非，并将结果保存到destkey
+bitop not destkey key
+
+# 统计指定位区间上的值为1的个数，左边从0起，从右向左是从-1开始，官方start，end是位，测试后是字节
+bitcount key [start] [end]
+# 表示第一个字节的统计
+bitcount key 0 0 
+# 最常用的就是bitcount testkey
+bitcount testkey 0 -1 等价于 bitcount testkey
+
+# eg:
+set k1 99
+bitcount 99 # return 8 这里的99会被转换为字符串，字符串去找ascii，然后转换成二进制去查看。
+
+# Tip 
+bitcount在处理中文的时候要要特殊注意
+```
+
+位图的应用：
+
+```shell
+# 网站用户的上线次数统计(活跃用户)
+用户id为key，天作为offset，上线就置位为1
+比如id为500的用户，今天的第一天上线，第30天上线
+setbit u500 1 1
+setbit u500 30 1
+bitcount u500
+keys u*
+
+# 按天统计网站活跃用户
+天作为key，用户id为offset，上线置位为1，求一段时间内的活跃用户数
+setbit 20160602 15 1
+setbit 20160601 123 1
+setbit 20160608 123 1
+求6月1日到6月10号的活跃用户
+bitop or 20160601-10 20160601 20160602 20160603 …… 20160610
+bitcount 20160601-10
+```
+
+python脚本示例：
+
+```python
+import redis
+r = redis.Redis(host='127.0.0.1',port=6379,db=0)
+r.setbit('u1',1,1)
+r.setbit('u1',30,1)
+
+# 模拟用户在一年内登录的记录
+for i in range(3, 365, 3):
+    r.setbit('u101', i, 1)
+    
+for i in range(4, 365, 2):
+    r.setbit('u105', i, 1)
+    
+userlit = r.keys('u*')
+# 活跃用户列表
+Au = []
+# 非活跃用户列表
+Nau = []
+for u in userlist:
+    loginCount = r.bitcount(u)
+    if loginCount > 100:
+        Au.append((u,loginCount))
+    else:
+        Nau.append((u,loginCount))
+```
 
 ### 数字操作
 
@@ -200,15 +283,15 @@ OK
 "11.14"
 ```
 
-
-
 ## 其他操作
 
 - 清空redis
 
   ```shell
-  # 这个基本不要用，会丢饭碗的~
+  # 这个基本不要用，会丢饭碗的~，这是清楚当前库数据
   flusbdb
+  # 清除所有库中的数据
+  flushall
   ```
 
 - 过期相关操作
