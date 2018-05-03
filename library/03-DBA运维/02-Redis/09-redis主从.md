@@ -93,6 +93,13 @@ slaveof 127.0.0.1 6379
 
 #### 配置举例
 
+**配置项**
+
+```shell
+port 26379
+sentinel monitor m1 192.168.56.101 6379 1
+```
+
 我准备了两台机器，一台192.168.56.101，一台192.168.56.102，101上起了6379.6380.6381三个实例，然后也在102上起了一个实例，其中101的6379是master，其他的都是slave。启动以后哨兵会去自动发现master的slaves这个其实在日志里我们就可以看到，可以很直接的体现：
 
 ```shell
@@ -103,7 +110,7 @@ slaveof 127.0.0.1 6379
 * +slave slave 192.168.56.102:6379 192.168.56.102 6379 @ m1 127.0.0.1 6379
 ```
 
-现在手动把master停掉可以发现哨兵的日志立即就有反应：
+现在手动把master停掉可以发现哨兵的日志立即就有反应，这样的报错会间隔一段时间，有这样一个过程：
 
 ```shell
 # Connection with master lost.
@@ -113,3 +120,69 @@ slaveof 127.0.0.1 6379
 # Error condition on socket for SYNC: Connection refused
 ```
 
+当哨兵真的认为这个master已经挂掉了的时候就会开始采取提主的操作：
+
+```shell
+# +sdown master m1 127.0.0.1 6379
++odown master m1 127.0.0.1 6379 #quorum 1/1
+# +new-epoch 1
+# +try-failover master m1 127.0.0.1 6379
+# +vote-for-leader 7e5e9e712ad101aeb577042106a5cc8ffddbb45a 1
+# +elected-leader master m1 127.0.0.1 6379
+# +failover-state-select-slave master m1 127.0.0.1 6379
+# +selected-slave slave 127.0.0.1:6380 127.0.0.1 6380 @ m1 127.0.0.1 6379
+* +failover-state-send-slaveof-noone slave 127.0.0.1:6380 127.0.0.1 6380 @ m1 127.0.0.1 6379
+* +failover-state-wait-promotion slave 127.0.0.1:6380 127.0.0.1 6380 @ m1 127.0.0.1 6379
+* Discarding previously cached master state.
+* MASTER MODE enabled (user request)
+* Connecting to MASTER 127.0.0.1:6379
+* MASTER <-> SLAVE sync started
+# Error condition on socket for SYNC: Connection refused
+# +promoted-slave slave 127.0.0.1:6380 127.0.0.1 6380 @ m1 127.0.0.1 6379
+# +failover-state-reconf-slaves master m1 127.0.0.1 6379
+* +slave-reconf-sent slave 127.0.0.1:6381 127.0.0.1 6381 @ m1 127.0.0.1 6379
+* Discarding previously cached master state.
+* SLAVE OF 127.0.0.1:6380 enabled (user request)
+* Connecting to MASTER 127.0.0.1:6380
+* MASTER <-> SLAVE sync started
+* Non blocking connect for SYNC fired the event.
+* Master replied to PING, replication can continue...
+* Partial resynchronization not possible (no cached master)
+* Slave 127.0.0.1:6381 asks for synchronization
+* Full resync requested by slave 127.0.0.1:6381
+* Starting BGSAVE for SYNC with target: disk
+* Background saving started by pid 6474
+* Full resync from master: 2b29611014608aa041ec4b36b1ddb35dc7172ea7:1
+* DB saved on disk
+* RDB: 0 MB of memory used by copy-on-write
+* Background saving terminated with success
+* Synchronization with slave 127.0.0.1:6381 succeeded
+* MASTER <-> SLAVE sync: receiving 41 bytes from master
+* MASTER <-> SLAVE sync: Flushing old data
+* MASTER <-> SLAVE sync: Loading DB in memory
+* MASTER <-> SLAVE sync: Finished with success
+* +slave-reconf-inprog slave 127.0.0.1:6381 127.0.0.1 6381 @ m1 127.0.0.1 6379
+* +slave-reconf-done slave 127.0.0.1:6381 127.0.0.1 6381 @ m1 127.0.0.1 6379
+* +slave-reconf-sent slave 192.168.56.102:6379 192.168.56.102 6379 @ m1 127.0.0.1 6379
+* +slave-reconf-inprog slave 192.168.56.102:6379 192.168.56.102 6379 @ m1 127.0.0.1 6379
+# +failover-end-for-timeout master m1 127.0.0.1 6379
+# +failover-end master m1 127.0.0.1 6379
+* +slave-reconf-sent-be slave 192.168.56.102:6379 192.168.56.102 6379 @ m1 127.0.0.1 6379
+* +slave-reconf-sent-be slave 127.0.0.1:6380 127.0.0.1 6380 @ m1 127.0.0.1 6379
+# +switch-master m1 127.0.0.1 6379 127.0.0.1 6380
+* +slave slave 127.0.0.1:6381 127.0.0.1 6381 @ m1 127.0.0.1 6380
+* +slave slave 192.168.56.102:6379 192.168.56.102 6379 @ m1 127.0.0.1 6380
+* +slave slave 127.0.0.1:6379 127.0.0.1 6379 @ m1 127.0.0.1 6380
+# +sdown slave 127.0.0.1:6379 127.0.0.1 6379 @ m1 127.0.0.1 6380
+```
+
+#### 注意事项
+
+- 注意不要在哨兵中写127.0.0.1这种的地址，如果哨兵真的开始切换地址以后从机有可能找不到master。
+
+## 总结
+
+- 主从复制，解决了读请求的分担，从节点下线，会使得读请求能力有所下降
+- Master只有一个，存在单点问题
+- Sentinel会在master下线后自动执行failover操作，提升一台slave为master，并让其他的slaves重新成为新的master的slaves。
+- 主从复制+哨兵Sentinel只解决了读性能和高可用问题，但是并没有解决写性能安全和瓶颈，同时也没有应对应用动态切换地址的方案。
