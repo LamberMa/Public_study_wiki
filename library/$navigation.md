@@ -66,6 +66,15 @@
     - [23、innodb和myisam](?file=03-DBA运维/01-Mysql/23-23、innodb和myisam "23、innodb和myisam")
     - [24、mysql监控](?file=03-DBA运维/01-Mysql/24-24、mysql监控 "24、mysql监控")
 - **Redis**
+    - [Redis初探&安装](?file=03-DBA运维/02-Redis/01-Redis初探&安装 "Redis初探&安装")
+    - [redis配置文件详解](?file=03-DBA运维/02-Redis/02-redis配置文件详解 "redis配置文件详解")
+    - [redis的简单实用](?file=03-DBA运维/02-Redis/03-redis的简单实用 "redis的简单实用")
+    - [Hash散列操作](?file=03-DBA运维/02-Redis/04-Hash散列操作 "Hash散列操作")
+    - [集合-有序集合](?file=03-DBA运维/02-Redis/05-集合-有序集合 "集合-有序集合")
+    - [redis的持久化](?file=03-DBA运维/02-Redis/06-redis的持久化 "redis的持久化")
+    - [redis事物](?file=03-DBA运维/02-Redis/07-redis事物 "redis事物")
+    - [redis消息发布与订阅](?file=03-DBA运维/02-Redis/08-redis消息发布与订阅 "redis消息发布与订阅")
+    - [redis主从](?file=03-DBA运维/02-Redis/09-redis主从 "redis主从")
 
 ##### Git
 - [初识git](?file=04-Git/01-初识git "初识git")

@@ -46,7 +46,7 @@ tcp-backlog 511
 # unixsocket /tmp/redis.sock
 # unixsocketperm 700
 
-# 超时时间
+# 超时时间，0表示永不超时。
 timeout 0
 
 # TCP keepalive.单位为秒，如果设置为0那么就不会进行keepaliverd检测，建议设置成60
@@ -55,7 +55,7 @@ tcp-keepalive 0
 # 设置日志的级别，默认是notice，还有debug，verbose，warning集中可以选择。debug适用于开发模式，verbose有用的信息不多，但是没有debug那么乱，notice是适度的较为详细的日志，生产环境一般你想看的这里都体现了，warning只会打印非常重要的或者致命的问题。
 loglevel notice
 
-# 日志位置配置，这里可以为空，这样Redis会将日志输出到标准输出，但是如果redis不是以daemon方式运行的话那么就直接给输出到/dev/null里去了。
+# 日志位置配置，这里可以为空，这样Redis会将日志输出到标准输出，但是如果redis不是以daemon方式运行的话那么就直接给输出到/dev/null里去了。logfile stdout
 logfile /usr/local/redis2.8/redis_6379.log
 
 # 如果要允许日志记录到系统日志的话就设置这个选项为yes。
@@ -70,427 +70,9 @@ logfile /usr/local/redis2.8/redis_6379.log
 # 默认有16个库，可以使用select命令切换库。
 databases 16
 
-################################ SNAPSHOTTING  ################################
-#
-# Save the DB on disk:
-#
-#   save <seconds> <changes>
-#
-#   Will save the DB if both the given number of seconds and the given
-#   number of write operations against the DB occurred.
-#
-#   In the example below the behaviour will be to save:
-#   after 900 sec (15 min) if at least 1 key changed
-#   after 300 sec (5 min) if at least 10 keys changed
-#   after 60 sec if at least 10000 keys changed
-#
-#   Note: you can disable saving completely by commenting out all "save" lines.
-#
-#   It is also possible to remove all the previously configured save
-#   points by adding a save directive with a single empty string argument
-#   like in the following example:
-#
-#   save ""
-
-save 900 1
-save 300 10
-save 60 10000
-
-# By default Redis will stop accepting writes if RDB snapshots are enabled
-# (at least one save point) and the latest background save failed.
-# This will make the user aware (in a hard way) that data is not persisting
-# on disk properly, otherwise chances are that no one will notice and some
-# disaster will happen.
-#
-# If the background saving process will start working again Redis will
-# automatically allow writes again.
-#
-# However if you have setup your proper monitoring of the Redis server
-# and persistence, you may want to disable this feature so that Redis will
-# continue to work as usual even if there are problems with disk,
-# permissions, and so forth.
-stop-writes-on-bgsave-error yes
-
-# Compress string objects using LZF when dump .rdb databases?
-# For default that's set to 'yes' as it's almost always a win.
-# If you want to save some CPU in the saving child set it to 'no' but
-# the dataset will likely be bigger if you have compressible values or keys.
-rdbcompression yes
-
-# Since version 5 of RDB a CRC64 checksum is placed at the end of the file.
-# This makes the format more resistant to corruption but there is a performance
-# hit to pay (around 10%) when saving and loading RDB files, so you can disable it
-# for maximum performances.
-#
-# RDB files created with checksum disabled have a checksum of zero that will
-# tell the loading code to skip the check.
-rdbchecksum yes
-
-# The filename where to dump the DB
-dbfilename dump.rdb
-
-# The working directory.
-#
-# The DB will be written inside this directory, with the filename specified
-# above using the 'dbfilename' configuration directive.
-#
-# The Append Only File will also be created inside this directory.
-#
-# Note that you must specify a directory here, not a file name.
-dir /usr/local/redis2.8/6379
-
-################################# REPLICATION #################################
-
-# Master-Slave replication. Use slaveof to make a Redis instance a copy of
-# another Redis server. A few things to understand ASAP about Redis replication.
-#
-# 1) Redis replication is asynchronous, but you can configure a master to
-#    stop accepting writes if it appears to be not connected with at least
-#    a given number of slaves.
-# 2) Redis slaves are able to perform a partial resynchronization with the
-#    master if the replication link is lost for a relatively small amount of
-#    time. You may want to configure the replication backlog size (see the next
-#    sections of this file) with a sensible value depending on your needs.
-# 3) Replication is automatic and does not need user intervention. After a
-#    network partition slaves automatically try to reconnect to masters
-#    and resynchronize with them.
-#
-# slaveof <masterip> <masterport>
-
-# If the master is password protected (using the "requirepass" configuration
-# directive below) it is possible to tell the slave to authenticate before
-# starting the replication synchronization process, otherwise the master will
-# refuse the slave request.
-#
-# masterauth <master-password>
-
-# When a slave loses its connection with the master, or when the replication
-# is still in progress, the slave can act in two different ways:
-#
-# 1) if slave-serve-stale-data is set to 'yes' (the default) the slave will
-#    still reply to client requests, possibly with out of date data, or the
-#    data set may just be empty if this is the first synchronization.
-#
-# 2) if slave-serve-stale-data is set to 'no' the slave will reply with
-#    an error "SYNC with master in progress" to all the kind of commands
-#    but to INFO and SLAVEOF.
-#
-slave-serve-stale-data yes
-
-# You can configure a slave instance to accept writes or not. Writing against
-# a slave instance may be useful to store some ephemeral data (because data
-# written on a slave will be easily deleted after resync with the master) but
-# may also cause problems if clients are writing to it because of a
-# misconfiguration.
-#
-# Since Redis 2.6 by default slaves are read-only.
-#
-# Note: read only slaves are not designed to be exposed to untrusted clients
-# on the internet. It's just a protection layer against misuse of the instance.
-# Still a read only slave exports by default all the administrative commands
-# such as CONFIG, DEBUG, and so forth. To a limited extent you can improve
-# security of read only slaves using 'rename-command' to shadow all the
-# administrative / dangerous commands.
-slave-read-only yes
-
-# Replication SYNC strategy: disk or socket.
-#
-# -------------------------------------------------------
-# WARNING: DISKLESS REPLICATION IS EXPERIMENTAL CURRENTLY
-# -------------------------------------------------------
-#
-# New slaves and reconnecting slaves that are not able to continue the replication
-# process just receiving differences, need to do what is called a "full
-# synchronization". An RDB file is transmitted from the master to the slaves.
-# The transmission can happen in two different ways:
-#
-# 1) Disk-backed: The Redis master creates a new process that writes the RDB
-#                 file on disk. Later the file is transferred by the parent
-#                 process to the slaves incrementally.
-# 2) Diskless: The Redis master creates a new process that directly writes the
-#              RDB file to slave sockets, without touching the disk at all.
-#
-# With disk-backed replication, while the RDB file is generated, more slaves
-# can be queued and served with the RDB file as soon as the current child producing
-# the RDB file finishes its work. With diskless replication instead once
-# the transfer starts, new slaves arriving will be queued and a new transfer
-# will start when the current one terminates.
-#
-# When diskless replication is used, the master waits a configurable amount of
-# time (in seconds) before starting the transfer in the hope that multiple slaves
-# will arrive and the transfer can be parallelized.
-#
-# With slow disks and fast (large bandwidth) networks, diskless replication
-# works better.
-repl-diskless-sync no
-
-# When diskless replication is enabled, it is possible to configure the delay
-# the server waits in order to spawn the child that trnasfers the RDB via socket
-# to the slaves.
-#
-# This is important since once the transfer starts, it is not possible to serve
-# new slaves arriving, that will be queued for the next RDB transfer, so the server
-# waits a delay in order to let more slaves arrive.
-#
-# The delay is specified in seconds, and by default is 5 seconds. To disable
-# it entirely just set it to 0 seconds and the transfer will start ASAP.
-repl-diskless-sync-delay 5
-
-# Slaves send PINGs to server in a predefined interval. It's possible to change
-# this interval with the repl_ping_slave_period option. The default value is 10
-# seconds.
-#
-# repl-ping-slave-period 10
-
-# The following option sets the replication timeout for:
-#
-# 1) Bulk transfer I/O during SYNC, from the point of view of slave.
-# 2) Master timeout from the point of view of slaves (data, pings).
-# 3) Slave timeout from the point of view of masters (REPLCONF ACK pings).
-#
-# It is important to make sure that this value is greater than the value
-# specified for repl-ping-slave-period otherwise a timeout will be detected
-# every time there is low traffic between the master and the slave.
-#
-# repl-timeout 60
-
-# Disable TCP_NODELAY on the slave socket after SYNC?
-#
-# If you select "yes" Redis will use a smaller number of TCP packets and
-# less bandwidth to send data to slaves. But this can add a delay for
-# the data to appear on the slave side, up to 40 milliseconds with
-# Linux kernels using a default configuration.
-#
-# If you select "no" the delay for data to appear on the slave side will
-# be reduced but more bandwidth will be used for replication.
-#
-# By default we optimize for low latency, but in very high traffic conditions
-# or when the master and slaves are many hops away, turning this to "yes" may
-# be a good idea.
-repl-disable-tcp-nodelay no
-
-# Set the replication backlog size. The backlog is a buffer that accumulates
-# slave data when slaves are disconnected for some time, so that when a slave
-# wants to reconnect again, often a full resync is not needed, but a partial
-# resync is enough, just passing the portion of data the slave missed while
-# disconnected.
-#
-# The bigger the replication backlog, the longer the time the slave can be
-# disconnected and later be able to perform a partial resynchronization.
-#
-# The backlog is only allocated once there is at least a slave connected.
-#
-# repl-backlog-size 1mb
-
-# After a master has no longer connected slaves for some time, the backlog
-# will be freed. The following option configures the amount of seconds that
-# need to elapse, starting from the time the last slave disconnected, for
-# the backlog buffer to be freed.
-#
-# A value of 0 means to never release the backlog.
-#
-# repl-backlog-ttl 3600
-
-# The slave priority is an integer number published by Redis in the INFO output.
-# It is used by Redis Sentinel in order to select a slave to promote into a
-# master if the master is no longer working correctly.
-#
-# A slave with a low priority number is considered better for promotion, so
-# for instance if there are three slaves with priority 10, 100, 25 Sentinel will
-# pick the one with priority 10, that is the lowest.
-#
-# However a special priority of 0 marks the slave as not able to perform the
-# role of master, so a slave with priority of 0 will never be selected by
-# Redis Sentinel for promotion.
-#
-# By default the priority is 100.
-slave-priority 100
-
-# It is possible for a master to stop accepting writes if there are less than
-# N slaves connected, having a lag less or equal than M seconds.
-#
-# The N slaves need to be in "online" state.
-#
-# The lag in seconds, that must be <= the specified value, is calculated from
-# the last ping received from the slave, that is usually sent every second.
-#
-# This option does not GUARANTEE that N replicas will accept the write, but
-# will limit the window of exposure for lost writes in case not enough slaves
-# are available, to the specified number of seconds.
-#
-# For example to require at least 3 slaves with a lag <= 10 seconds use:
-#
-# min-slaves-to-write 3
-# min-slaves-max-lag 10
-#
-# Setting one or the other to 0 disables the feature.
-#
-# By default min-slaves-to-write is set to 0 (feature disabled) and
-# min-slaves-max-lag is set to 10.
 
 
 
-
-
-############################## APPEND ONLY MODE ###############################
-
-# By default Redis asynchronously dumps the dataset on disk. This mode is
-# good enough in many applications, but an issue with the Redis process or
-# a power outage may result into a few minutes of writes lost (depending on
-# the configured save points).
-#
-# The Append Only File is an alternative persistence mode that provides
-# much better durability. For instance using the default data fsync policy
-# (see later in the config file) Redis can lose just one second of writes in a
-# dramatic event like a server power outage, or a single write if something
-# wrong with the Redis process itself happens, but the operating system is
-# still running correctly.
-#
-# AOF and RDB persistence can be enabled at the same time without problems.
-# If the AOF is enabled on startup Redis will load the AOF, that is the file
-# with the better durability guarantees.
-#
-# Please check http://redis.io/topics/persistence for more information.
-
-appendonly no
-
-# The name of the append only file (default: "appendonly.aof")
-
-appendfilename "appendonly.aof"
-
-# The fsync() call tells the Operating System to actually write data on disk
-# instead of waiting for more data in the output buffer. Some OS will really flush
-# data on disk, some other OS will just try to do it ASAP.
-#
-# Redis supports three different modes:
-#
-# no: don't fsync, just let the OS flush the data when it wants. Faster.
-# always: fsync after every write to the append only log. Slow, Safest.
-# everysec: fsync only one time every second. Compromise.
-#
-# The default is "everysec", as that's usually the right compromise between
-# speed and data safety. It's up to you to understand if you can relax this to
-# "no" that will let the operating system flush the output buffer when
-# it wants, for better performances (but if you can live with the idea of
-# some data loss consider the default persistence mode that's snapshotting),
-# or on the contrary, use "always" that's very slow but a bit safer than
-# everysec.
-#
-# More details please check the following article:
-# http://antirez.com/post/redis-persistence-demystified.html
-#
-# If unsure, use "everysec".
-
-# appendfsync always
-appendfsync everysec
-# appendfsync no
-
-# When the AOF fsync policy is set to always or everysec, and a background
-# saving process (a background save or AOF log background rewriting) is
-# performing a lot of I/O against the disk, in some Linux configurations
-# Redis may block too long on the fsync() call. Note that there is no fix for
-# this currently, as even performing fsync in a different thread will block
-# our synchronous write(2) call.
-#
-# In order to mitigate this problem it's possible to use the following option
-# that will prevent fsync() from being called in the main process while a
-# BGSAVE or BGREWRITEAOF is in progress.
-#
-# This means that while another child is saving, the durability of Redis is
-# the same as "appendfsync none". In practical terms, this means that it is
-# possible to lose up to 30 seconds of log in the worst scenario (with the
-# default Linux settings).
-#
-# If you have latency problems turn this to "yes". Otherwise leave it as
-# "no" that is the safest pick from the point of view of durability.
-
-no-appendfsync-on-rewrite no
-
-# Automatic rewrite of the append only file.
-# Redis is able to automatically rewrite the log file implicitly calling
-# BGREWRITEAOF when the AOF log size grows by the specified percentage.
-#
-# This is how it works: Redis remembers the size of the AOF file after the
-# latest rewrite (if no rewrite has happened since the restart, the size of
-# the AOF at startup is used).
-#
-# This base size is compared to the current size. If the current size is
-# bigger than the specified percentage, the rewrite is triggered. Also
-# you need to specify a minimal size for the AOF file to be rewritten, this
-# is useful to avoid rewriting the AOF file even if the percentage increase
-# is reached but it is still pretty small.
-#
-# Specify a percentage of zero in order to disable the automatic AOF
-# rewrite feature.
-
-auto-aof-rewrite-percentage 100
-auto-aof-rewrite-min-size 64mb
-
-# An AOF file may be found to be truncated at the end during the Redis
-# startup process, when the AOF data gets loaded back into memory.
-# This may happen when the system where Redis is running
-# crashes, especially when an ext4 filesystem is mounted without the
-# data=ordered option (however this can't happen when Redis itself
-# crashes or aborts but the operating system still works correctly).
-#
-# Redis can either exit with an error when this happens, or load as much
-# data as possible (the default now) and start if the AOF file is found
-# to be truncated at the end. The following option controls this behavior.
-#
-# If aof-load-truncated is set to yes, a truncated AOF file is loaded and
-# the Redis server starts emitting a log to inform the user of the event.
-# Otherwise if the option is set to no, the server aborts with an error
-# and refuses to start. When the option is set to no, the user requires
-# to fix the AOF file using the "redis-check-aof" utility before to restart
-# the server.
-#
-# Note that if the AOF file will be found to be corrupted in the middle
-# the server will still exit with an error. This option only applies when
-# Redis will try to read more data from the AOF file but not enough bytes
-# will be found.
-aof-load-truncated yes
-
-################################ LUA SCRIPTING  ###############################
-
-# Max execution time of a Lua script in milliseconds.
-#
-# If the maximum execution time is reached Redis will log that a script is
-# still in execution after the maximum allowed time and will start to
-# reply to queries with an error.
-#
-# When a long running script exceeds the maximum execution time only the
-# SCRIPT KILL and SHUTDOWN NOSAVE commands are available. The first can be
-# used to stop a script that did not yet called write commands. The second
-# is the only way to shut down the server in the case a write command was
-# already issued by the script but the user doesn't want to wait for the natural
-# termination of the script.
-#
-# Set it to 0 or a negative value for unlimited execution without warnings.
-lua-time-limit 5000
-
-################################## SLOW LOG ###################################
-
-# The Redis Slow Log is a system to log queries that exceeded a specified
-# execution time. The execution time does not include the I/O operations
-# like talking with the client, sending the reply and so forth,
-# but just the time needed to actually execute the command (this is the only
-# stage of command execution where the thread is blocked and can not serve
-# other requests in the meantime).
-#
-# You can configure the slow log with two parameters: one tells Redis
-# what is the execution time, in microseconds, to exceed in order for the
-# command to get logged, and the other parameter is the length of the
-# slow log. When a new command is logged the oldest one is removed from the
-# queue of logged commands.
-
-# The following time is expressed in microseconds, so 1000000 is equivalent
-# to one second. Note that a negative number disables the slow log, while
-# a value of zero forces the logging of every command.
-slowlog-log-slower-than 10000
-
-# There is no limit to this length. Just be aware that it will consume memory.
-# You can reclaim memory used by the slow log with SLOWLOG RESET.
-slowlog-max-len 128
 
 ################################ LATENCY MONITOR ##############################
 
@@ -681,6 +263,55 @@ hz 10
 aof-rewrite-incremental-fsync yes
 ```
 
+## 快照
+
+```shell
+# 其实就是RDB持久化
+save 900 1
+save 300 10
+save 60 10000
+
+# 在开启了rdb的情况下，如果最新的后台写入出错，那么redis将停止接收写请求。默认是yes，如果设置成no表示你不在乎数据不一致或者有其他的手段发现和控制。后台保存功能恢复以后redis自动开始允许写入。
+stop-writes-on-bgsave-error yes
+
+# 启用LZF算法进行压缩快照文件
+rdbcompression yes
+
+# 在存储快照后，还可以让redis使用crc64算法来进行数据的校验。
+rdbchecksum yes
+
+# rdb文件的文件名
+dbfilename dump.rdb
+
+# 指定数据库的存放目录
+dir /usr/local/redis2.8/6379
+```
+
+## AOF
+
+```shell
+# 默认aof是关闭的，如果要开启需要手动改为yes。rdb和aof可以一起打开的。如果aof开启的话，redis启动以后会优先加载aof的记录的备份而不是rdb的。
+appendonly no
+
+# aof文件名，(default: "appendonly.aof")
+appendfilename "appendonly.aof"
+
+# 备份策略
+# appendfsync always
+appendfsync everysec
+# appendfsync no
+
+# 重写时是否可以运用appendfsync，用默认no就可以了，保证数据的安全性。
+no-appendfsync-on-rewrite no
+
+# 自动重写机制，redis会记录上一次重写的aof的大小，默认配置是当aof文件大小是上次rewrite后大小的一倍并且文件大于64M时触发。如果说刚启动，还没有冲写过，那么这个上一次的大小就被记录为使用的aof文件的大小。百分比设置为0意味着禁用自动重写功能。
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+
+# 指redis在恢复时，会忽略最后一条可能存在问题的指令。默认值yes。即在aof写入时，可能存在指令写错的问题(突然断电，写了一半)，这种情况下，yes会log并继续，而no会直接恢复失败.
+aof-load-truncated yes
+```
+
 ## 安全选项设置
 
 ```shell
@@ -699,7 +330,7 @@ aof-rewrite-incremental-fsync yes
 # maxmemory <bytes>
 
 # 缓存过期策略，或者当达到设置的内存上限以后redis处理缓存的策略，有几个过期策略供你选择。生产环境中不要使用永不过期。
-# noeviction：永不过期，写不了就直接报错
+# noeviction：永不过期，写不了就直接报错，但是可以读。
 # volatile-lru：使用LRU算法移除key，只对设置了过期时间的key，默认值
 # allkeys-lru：使用LRU算法移除key
 # volatile-random：在过期集合中随机移除key，只对设置了过期时间的key
@@ -707,7 +338,250 @@ aof-rewrite-incremental-fsync yes
 # volatile-ttl：移除那些ttl值最小的key，即那些最近要过期的key。
 # maxmemory-policy volatile-lru
 
-# 设置样本数量，LRU算法和最小TTL算法并非都是精准的算法，而是估算值，所以你可以设置样本的大小，redis默认会检查这么多个key并选择其中LRU(less recently use)的那个
+# 设置样本数量，LRU算法和最小TTL算法并非都是精准的算法，而是估算值。下面的配置就是默认选取3个样本进行内部的一个检测。所以你可以设置样本的大小，redis默认会检查这么多个key并选择其中LRU(less recently use)的那个
 # maxmemory-samples 3
+```
+
+## 主从复制
+
+```shell
+################################# REPLICATION #################################
+
+# Master-Slave replication. Use slaveof to make a Redis instance a copy of
+# another Redis server. A few things to understand ASAP about Redis replication.
+#
+# 1) Redis replication is asynchronous, but you can configure a master to
+#    stop accepting writes if it appears to be not connected with at least
+#    a given number of slaves.
+# 2) Redis slaves are able to perform a partial resynchronization with the
+#    master if the replication link is lost for a relatively small amount of
+#    time. You may want to configure the replication backlog size (see the next
+#    sections of this file) with a sensible value depending on your needs.
+# 3) Replication is automatic and does not need user intervention. After a
+#    network partition slaves automatically try to reconnect to masters
+#    and resynchronize with them.
+#
+# slaveof <masterip> <masterport>
+
+# If the master is password protected (using the "requirepass" configuration
+# directive below) it is possible to tell the slave to authenticate before
+# starting the replication synchronization process, otherwise the master will
+# refuse the slave request.
+#
+# masterauth <master-password>
+
+# When a slave loses its connection with the master, or when the replication
+# is still in progress, the slave can act in two different ways:
+#
+# 1) if slave-serve-stale-data is set to 'yes' (the default) the slave will
+#    still reply to client requests, possibly with out of date data, or the
+#    data set may just be empty if this is the first synchronization.
+#
+# 2) if slave-serve-stale-data is set to 'no' the slave will reply with
+#    an error "SYNC with master in progress" to all the kind of commands
+#    but to INFO and SLAVEOF.
+#
+slave-serve-stale-data yes
+
+# You can configure a slave instance to accept writes or not. Writing against
+# a slave instance may be useful to store some ephemeral data (because data
+# written on a slave will be easily deleted after resync with the master) but
+# may also cause problems if clients are writing to it because of a
+# misconfiguration.
+#
+# Since Redis 2.6 by default slaves are read-only.
+#
+# Note: read only slaves are not designed to be exposed to untrusted clients
+# on the internet. It's just a protection layer against misuse of the instance.
+# Still a read only slave exports by default all the administrative commands
+# such as CONFIG, DEBUG, and so forth. To a limited extent you can improve
+# security of read only slaves using 'rename-command' to shadow all the
+# administrative / dangerous commands.
+slave-read-only yes
+
+# Replication SYNC strategy: disk or socket.
+#
+# -------------------------------------------------------
+# WARNING: DISKLESS REPLICATION IS EXPERIMENTAL CURRENTLY
+# -------------------------------------------------------
+#
+# New slaves and reconnecting slaves that are not able to continue the replication
+# process just receiving differences, need to do what is called a "full
+# synchronization". An RDB file is transmitted from the master to the slaves.
+# The transmission can happen in two different ways:
+#
+# 1) Disk-backed: The Redis master creates a new process that writes the RDB
+#                 file on disk. Later the file is transferred by the parent
+#                 process to the slaves incrementally.
+# 2) Diskless: The Redis master creates a new process that directly writes the
+#              RDB file to slave sockets, without touching the disk at all.
+#
+# With disk-backed replication, while the RDB file is generated, more slaves
+# can be queued and served with the RDB file as soon as the current child producing
+# the RDB file finishes its work. With diskless replication instead once
+# the transfer starts, new slaves arriving will be queued and a new transfer
+# will start when the current one terminates.
+#
+# When diskless replication is used, the master waits a configurable amount of
+# time (in seconds) before starting the transfer in the hope that multiple slaves
+# will arrive and the transfer can be parallelized.
+#
+# With slow disks and fast (large bandwidth) networks, diskless replication
+# works better.
+repl-diskless-sync no
+
+# When diskless replication is enabled, it is possible to configure the delay
+# the server waits in order to spawn the child that trnasfers the RDB via socket
+# to the slaves.
+#
+# This is important since once the transfer starts, it is not possible to serve
+# new slaves arriving, that will be queued for the next RDB transfer, so the server
+# waits a delay in order to let more slaves arrive.
+#
+# The delay is specified in seconds, and by default is 5 seconds. To disable
+# it entirely just set it to 0 seconds and the transfer will start ASAP.
+repl-diskless-sync-delay 5
+
+# Slaves send PINGs to server in a predefined interval. It's possible to change
+# this interval with the repl_ping_slave_period option. The default value is 10
+# seconds.
+#
+# repl-ping-slave-period 10
+
+# The following option sets the replication timeout for:
+#
+# 1) Bulk transfer I/O during SYNC, from the point of view of slave.
+# 2) Master timeout from the point of view of slaves (data, pings).
+# 3) Slave timeout from the point of view of masters (REPLCONF ACK pings).
+#
+# It is important to make sure that this value is greater than the value
+# specified for repl-ping-slave-period otherwise a timeout will be detected
+# every time there is low traffic between the master and the slave.
+#
+# repl-timeout 60
+
+# Disable TCP_NODELAY on the slave socket after SYNC?
+#
+# If you select "yes" Redis will use a smaller number of TCP packets and
+# less bandwidth to send data to slaves. But this can add a delay for
+# the data to appear on the slave side, up to 40 milliseconds with
+# Linux kernels using a default configuration.
+#
+# If you select "no" the delay for data to appear on the slave side will
+# be reduced but more bandwidth will be used for replication.
+#
+# By default we optimize for low latency, but in very high traffic conditions
+# or when the master and slaves are many hops away, turning this to "yes" may
+# be a good idea.
+repl-disable-tcp-nodelay no
+
+# Set the replication backlog size. The backlog is a buffer that accumulates
+# slave data when slaves are disconnected for some time, so that when a slave
+# wants to reconnect again, often a full resync is not needed, but a partial
+# resync is enough, just passing the portion of data the slave missed while
+# disconnected.
+#
+# The bigger the replication backlog, the longer the time the slave can be
+# disconnected and later be able to perform a partial resynchronization.
+#
+# The backlog is only allocated once there is at least a slave connected.
+#
+# repl-backlog-size 1mb
+
+# After a master has no longer connected slaves for some time, the backlog
+# will be freed. The following option configures the amount of seconds that
+# need to elapse, starting from the time the last slave disconnected, for
+# the backlog buffer to be freed.
+#
+# A value of 0 means to never release the backlog.
+#
+# repl-backlog-ttl 3600
+
+# The slave priority is an integer number published by Redis in the INFO output.
+# It is used by Redis Sentinel in order to select a slave to promote into a
+# master if the master is no longer working correctly.
+#
+# A slave with a low priority number is considered better for promotion, so
+# for instance if there are three slaves with priority 10, 100, 25 Sentinel will
+# pick the one with priority 10, that is the lowest.
+#
+# However a special priority of 0 marks the slave as not able to perform the
+# role of master, so a slave with priority of 0 will never be selected by
+# Redis Sentinel for promotion.
+#
+# By default the priority is 100.
+slave-priority 100
+
+# It is possible for a master to stop accepting writes if there are less than
+# N slaves connected, having a lag less or equal than M seconds.
+#
+# The N slaves need to be in "online" state.
+#
+# The lag in seconds, that must be <= the specified value, is calculated from
+# the last ping received from the slave, that is usually sent every second.
+#
+# This option does not GUARANTEE that N replicas will accept the write, but
+# will limit the window of exposure for lost writes in case not enough slaves
+# are available, to the specified number of seconds.
+#
+# For example to require at least 3 slaves with a lag <= 10 seconds use:
+#
+# min-slaves-to-write 3
+# min-slaves-max-lag 10
+#
+# Setting one or the other to 0 disables the feature.
+#
+# By default min-slaves-to-write is set to 0 (feature disabled) and
+# min-slaves-max-lag is set to 10.
+```
+
+## Lua脚本
+
+```shell
+################################ LUA SCRIPTING  ###############################
+
+# Max execution time of a Lua script in milliseconds.
+#
+# If the maximum execution time is reached Redis will log that a script is
+# still in execution after the maximum allowed time and will start to
+# reply to queries with an error.
+#
+# When a long running script exceeds the maximum execution time only the
+# SCRIPT KILL and SHUTDOWN NOSAVE commands are available. The first can be
+# used to stop a script that did not yet called write commands. The second
+# is the only way to shut down the server in the case a write command was
+# already issued by the script but the user doesn't want to wait for the natural
+# termination of the script.
+#
+# Set it to 0 or a negative value for unlimited execution without warnings.
+lua-time-limit 5000
+```
+
+## 慢日志
+
+```shell
+################################## SLOW LOG ###################################
+
+# The Redis Slow Log is a system to log queries that exceeded a specified
+# execution time. The execution time does not include the I/O operations
+# like talking with the client, sending the reply and so forth,
+# but just the time needed to actually execute the command (this is the only
+# stage of command execution where the thread is blocked and can not serve
+# other requests in the meantime).
+#
+# You can configure the slow log with two parameters: one tells Redis
+# what is the execution time, in microseconds, to exceed in order for the
+# command to get logged, and the other parameter is the length of the
+# slow log. When a new command is logged the oldest one is removed from the
+# queue of logged commands.
+
+# The following time is expressed in microseconds, so 1000000 is equivalent
+# to one second. Note that a negative number disables the slow log, while
+# a value of zero forces the logging of every command.
+slowlog-log-slower-than 10000
+
+# There is no limit to this length. Just be aware that it will consume memory.
+# You can reclaim memory used by the slow log with SLOWLOG RESET.
+slowlog-max-len 128
 ```
 
