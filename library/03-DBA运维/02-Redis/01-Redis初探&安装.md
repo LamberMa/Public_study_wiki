@@ -1,4 +1,4 @@
-# redis
+# Redis安装
 
 >- 支持数据结构类型丰富，比如string字符串，散列hashes，列表lists，集合sets，有序集合sorted sets于范围查询，bitmaps，hyperlogslogs和地理空间（geospatial）索引半径查询。
 >- 丰富的支持主流语言的客户端，c，c++，python，erlang，R，c#，java，php，obc，perl，ruby，scala，go，js
@@ -50,7 +50,7 @@ tar xf redis-2.8.18.tar.gz
 yum install gcc tcl -y   # 准备编译安装的环境
 make
 mkdir /usr/local/redis2.8
-make PREFIX=/usr/local/redis2.9 install
+make PREFIX=/usr/local/redis2.8 install
 
 # 拷贝对应的执行程序，设置环境变量
 cd /tools/redis-2.8.18
