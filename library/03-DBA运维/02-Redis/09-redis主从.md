@@ -28,12 +28,36 @@ slaveof <masterip> <masterport>
 slaveof 127.0.0.1 6379
 ```
 
+- master可以设置密码，设置密码后，需要需要填写密码
+
+```shell
+masterauth <passord>
+```
+
+- 设置slave大于多少后才允许写入
+
+```shell
+min-slaves-to-write <number of slaves>
+```
+
+- 设置从服务器的延迟不大于xx
+
+```shell
+min-slaves-max-lag <number of seconds>
+```
+
 可以看到主从复制的设置方式其实是及其简单的，直接配置一下就可以了。
 
-- 一个master可以有多个slave
+- 一个master可以有多个slave，首次的复制是全量的，后续的是增量的。
 - slave下线只是读请求的性能下降，因为slave一般是只读。
 - master下线，写请求无法执行
 - 可以手动在一台从机上执行slaveof no one，然后再其它redis上使用slaveof指向这个新的master，实现数据的同步。不过这个过程是纯手动的，如果想要实现自动就需要Sentine哨兵，实现故障转移FailOver操作。
+- info replication可以查看主从状态。
+
+### 主从方案
+
+- 一主双从
+- 薪火相传，比如ABC，A是B的master，B是C的master。B在角色上是salve，不过在info replication中也是可以看到C这个slave的。
 
 ## 哨兵
 
@@ -98,6 +122,12 @@ slaveof 127.0.0.1 6379
 ```shell
 port 26379
 sentinel monitor m1 192.168.56.101 6379 1
+sentinel auth-pass m1 testpass
+# 超过3w毫秒后认为主机宕机
+sentinel down-after-milliseconds m1 30000
+sentinel parallel-syncs m1 1
+# 当主从切换多久后认为主从切换失败
+sebtinel failover-timeout m1 180000
 ```
 
 我准备了两台机器，一台192.168.56.101，一台192.168.56.102，101上起了6379.6380.6381三个实例，然后也在102上起了一个实例，其中101的6379是master，其他的都是slave。启动以后哨兵会去自动发现master的slaves这个其实在日志里我们就可以看到，可以很直接的体现：

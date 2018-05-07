@@ -103,3 +103,25 @@ redis-server /usr/local/redis2.8/redis.conf
 - -a：传password
 - -n：一个redis里面可以由多个database，默认是16个，不同的db是隔离的。database number。默认的db是db0号，我们可以选择不同的号码切换到不同的数据库，数据库的数量可以在配置文件中去配置。
 
+## Redis保护模式
+
+- Bind 指定ip进行监听
+
+  ```shell
+  bind ip1 ip2 ip3 ip4
+  ```
+
+- protect mode 配置文件中有一个protected-mode
+
+  ```shell
+  protected-mode yes
+  # 单单只开启这个还没用还要加一个requirepass
+  requirepass testpass1
+
+  # 那么在登录的时候可以指定密码
+  redis-cli -p xxx -a testpass1 -h x.x.x.x
+  # 或者先使用redis-cli进来以后然后执行auth命令，然后再去执行redis命令
+  auth testpass1
+  ```
+
+  ​
