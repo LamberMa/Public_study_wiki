@@ -1,0 +1,795 @@
+# CMDB
+
+> 配置管理数据库
+
+## CMDB介绍
+
+运维愿景：
+
+	1. 自动装机
+	2. 配置管理
+	3. 监控
+	4. 堡垒机
+	
+	必备：资产管理
+
+目前状况：
+目前状况：
+	手动维护Excel表格
+	资产自动采集并汇报入库，少了块硬盘多了个内存自动记录汇报
+	
+	CMDB - 配置管理数据库（资产管理）
+
+如何实现自动采集？
+如何实现自动采集？
+	subprocess
+	Linux基本命令
+	v = subprocess.getoutput('ls')
+	1. Agent
+	
+	2. SSH类，paramiko，(机器少的时候用paramiko，因为ssh本身存在性能瓶颈)
+		pip3 install paramiko
+		
+	3. saltstack(Python开发)
+		master
+			yum install salt-master
+			
+			配置：1.1.1.1
+			service salt-master start
+			
+		salve
+			yum install salt-minion
+			配置：
+				master: 1.1.1.1
+			service salt-master start
+		salve
+			yum install salt-minion
+			配置：
+				master: 1.1.1.1
+			service salt-master start
+	
+	
+		授权：
+
+​		
+​		
+​		
+		执行命令：
+			在master上执行： salt "*" cmd.run "ifconfig"
+	
+	4. puppet(ruby)
+
+目标：兼容三种采集方式软件
+目标：兼容三种采集方式软件
+​	
+​		
+任务：
+	1. Agent方式
+
+		API：Django接收数据并入库
+	
+		程序：放置在每台服务器
+	
+	2. SSH类
+	
+		API：Django接收数据并入库
+	
+		程序：放在中控机
+	
+	3. saltstack
+	
+		http://www.cnblogs.com/wupeiqi/articles/6415436.html
+	
+		API：Django接收数据并入库
+	
+		master:
+			v = subprocess.getoutput('salt "*" cmd.run "ls"')
+	
+		前提：
+			两个虚拟机：
+				安装：
+					master
+					minion
+				
+				配置：
+					...
+				授权：
+					...
+					
+	发送：
+		# url = "http://127.0.0.1:8000/asset.html"
+		# import requests
+		#
+		# response = requests.post(url,data={'k1':value1,'k2':value2})
+		# print(response.text)
+	
+
+CMDB资产采集：
+CMDB资产采集：
+CMDB资产采集：
+
+- 采集资产：执行命令，正则或字符串方法获取想要的数据
+- 兼容性
+- 汇报数据
+
+```python
+# 使用字符串导入模块，下面就是从a模块下的b模块下导入c
+importlib.import_model('a.b.c')
+
+m = importlib.import_model('a.b.c')
+cls = getattr(m, 'd')
+cls()
+```
+
+面向对象：
+
+```python
+class Foo:
+    def __init__(self, xxx):
+        pass
+    @classmethod
+    def instance(cls):
+        return cls()
+    def process(self):
+        pass
+if hasattr(Foo, 'instance'):
+    obj = Foo.instance()
+else:
+    obj = Foo()
+```
+
+面向对象2：
+
+```python
+class A:
+    def f1(self):
+        self.f2()
+    def f2(self):
+        print('A.f2')
+
+class B(A):
+    def f2(self):
+        print("B.f2")
+obj = B()
+obj.f1()  # B.f2
+```
+
+
+
+
+
+项目目录：
+
+```python
+(cmdb) ➜  cmdb > tree -L 1 .
+.
+├── bin             # 可执行的程序文件
+├── config          # 配置目录
+├── lib             # 类库，可以使用的各种工具类
+└── src             # 业务代码
+```
+
+>CMDB资产采集：www.cnblogs.com/wupeiqi/articles/6415436.html
+
+
+
+
+
+
+
+## 中控客户端设计（AutoClient）
+
+### 配置文件设计
+
+> 很多应用程序在运行的时候不需要加任何参数就可以直接跑起来，或者说使用很少的参数就可以跑起来。其实并不是因为不需要参数，而是因为程序内部就包含了很多内置的参数供我们调用，当我们自己进行单独指定配置文件的参数项以后，程序又会按照我们指定的参数进行运行，因此配置文件设计思路有两点：
+>
+> 1. 程序包含一套内置的默认配置文件
+> 2. 用户可以自己定制配置文件的值，用户定制的配置优先权重要高于默认的
+
+首先按照以下的规则进行创建配置文件：
+
+```shell
+(cmdb) ➜  cmdb > tree . -L 2
+.
+├── bin
+│   ├── __init__.py
+│   └── start.py
+├── config
+│   ├── __init__.py
+│   └── settings.py              # 用户可以进行配置定义的配置文件
+├── lib
+│   ├── __init__.py
+│   └── conf
+│       ├── __init__.py
+│       ├── config.py            # 配置文件加载脚本
+│       └── global_settings.py   # 全局默认的配置文件
+├── src
+```
+
+为了方便测试，我们在全局配置文件和用户配置文件中添加一些配置项：
+
+```python
+# global_settings.py
+USER = 'lamber'
+PASSWORD = '123456'
+EMAIL = '1020561033@qq.com'
+BANNER = 'Hello World!'
+
+# settings.py
+MODE = "AGENT"
+```
+
+在配置脚本的py文件中进行加载配置项：
+
+```python
+# -*- coding: utf-8
+
+import os
+import importlib
+
+# 分别引入默认文件和用户配置文件
+from . import global_settings
+
+
+class Settings(object):
+    
+    def __init__(self):
+
+        # 找到默认配置，默认配置的优先级是要低于自定义的
+        # 因此默认配置先执行，通过dir属性拿到global_settings模块中的属性值
+        for name in dir(global_settings):
+            # 配置文件的每一个选项必须是大写的。
+            if name.isupper():
+                # 注意这里拿到的其实只不过是字符串而已，如果要想取属性值要利用到反射
+                value = getattr(global_settings, name)
+                # 通过setattr将对象的name属性设置为value的值
+                setattr(self, name, value)
+
+        # 随后找到自定义配置，从全局环境变量中拿USER_SETTINGS的值
+        # settings_module = os.environ['USER_SETTINGS']
+        # 替换成get要优于上面的写法，如果没有的话不会报错而会返回None
+        # USER_SETTINGS是在start入口文件进行设置的，内容为用户自定义配置
+        settings_module = os.environ.get('USER_SETTINGS')
+        if not settings_module:
+            return
+        # 根据字符串导入模块，返回的m其实就是对应的模块
+        m = importlib.import_module(settings_module)
+        for name in dir(m):
+            # 配置文件的每一个选项必须是大写的。
+            if name.isupper():
+                # 因为对应的用户自定义的选项在后面，因此如果有同名的name的话默认的会被自定义的覆盖
+                value = getattr(m, name)
+                setattr(self, name, value)
+
+
+# 只要以后导入这个settings就可以进行使用了。
+settings = Settings()
+```
+
+调用：
+
+```python
+# bin/start.py
+import os
+
+# 引用集成的文件就可以拿到对应的配置文件了。
+from lib.conf.config import settings
+
+# 全局变量做赋值，这个只在当前的运行的应用程序的环境变量里
+# 运行完了就没了，这个并不影响其他的程序。
+os.environ['USER_SETTINGS'] = 'config.settings'
+
+print(settings.USER)
+print(settings.EMAIL)
+print(settings.MODE)
+print(settings.BANNER)
+
+# 执行结果：
+lamber
+1020561033@qq.com
+AGENT
+Hello World!
+```
+
+这样我们就可以取到想要的默认配置和用户配置了。
+
+### 可插拔式插件
+
+> 作为数据采集和cmdb数据录入的中间人的中控机来讲，中控机具有采集客户端各个指标的功能，我们把这些采集指标的功能叫做功能插件，这个插件应该可以是灵活的进行管控的，就好像Django中的INSTALLED_APP，允许我们自己进行添加和删除。针对这个需求进行可插拔式插件的设计。
+
+可插拔式的插件对于用户来说是可以进行自己控制和定义的。因此可以在用户自定义配置文件中去进行配置。在项目根目录的src目录下新建一个plugins目录用于保存我们的自定义插件，每一个插件就是一个一个小的监控脚本，比如：
+
+```python
+➜  plugins > tree
+.
+├── __init__.py
+└── basic.py
+```
+
+既然是允许用户可以自定义的，那么就允许用户在setting配置文件中进行配置的。我们可以构造一个字典，其中key为要监控的对应的指标，value为对应插件所在路径，比如如下样式：
+
+```python
+PLUGINS_DICT = {
+    'basic': "src.plugins.basic.Basic",
+}
+```
+
+Python Package中的`__init__.py`文件会在模块被导入的时候执行，为了保证导入模块的时候，我们的组件全部加载执行并获取到数据，我们可以把对应的内容获取脚本写到plugins目录下的`__init__.py`中去。
+
+```python
+import importlib
+import subprocess
+import paramiko
+# 将用户配置的可插拔插件的配置项导入
+from lib.conf.config import settings
+
+
+class PluginManager(object):
+
+    def __init__(self, hostname=None):
+        """
+        把用到的内容都放到构造方法里清晰明了
+        因为采集方式不一样，那么有的需要主机名，有的也就不需要
+        需要的话就传递，不需要的话就默认为None
+        """
+        self.hostname = hostname
+        # 先把可插拔配置项拿到
+        self.plugin_dict = settings.PLUGINS_DICT
+        # 获取的方式有agent，ssh或者salt三种，这个是允许用户在配置文件里配置的。
+        self.mode = settings.MODE
+        self.debug = settings.DEBUG
+        # 如果当方式为ssh的模式，那么就需要ssh所必须的地址，端口，密码，或者是密钥
+        if self.mode == "SSH":
+            self.ssh_user = settings.SSH_USER
+            self.ssh_port = settings.SSH_PORT
+            self.ssh_pwd = settings.SSH_PWD
+            self.ssh_key = settings.SSH_KEY
+
+    def exec_plugin(self):
+        """
+        获取所有的插件，执行并获取插件的返回值
+        :return: 插件的返回值
+        """
+        # 构造一个空字典
+        response = {}
+        for k, v in self.plugin_dict.items():
+            """
+            循环遍历可插拔配置中的每一条记录项目，内容示例如下：
+            k = 'basic'，v = "src.plugins.basic.Basic",
+            需要导入模块然后运行再拿到模块的返回值，因此需要我们进行拆分
+            """
+            # rsplit表示从右面才是切割，1表示切一次，如此切割可以将模块路径和模块名切开
+            module_path, class_name = v.rsplit('.', 1)
+            m = importlib.import_module(module_path)
+            # 根据模块名去找类。
+            cls = getattr(m, class_name)
+            if cls:
+                # 根据v获取类，并执行其对应的process方法采集资产
+                # 这里直接把命令执行方法的内存地址传递了过去，供插件进行调用。
+                # 拿到插件的返回值以后更新字典
+                result = cls().process(self.command)
+                response[k] = result
+        return response
+
+    def command(self, cmd):
+		"""
+		对应的执行命令的方法，我们知道获取数据有三种方案，agent，ssh或者是salt
+		那么难道每次执行都要重新写一遍这三种方法么？当然不用。我们可以定义一个基类，在基类
+		中去实现这三种方法，然后后面的所有插件都继承这个基类就可以了，就可以在插件类中直接调用
+		这里没有采用继承的方案，而是自己去构造了一个内部的方法去实现。根据配置文件中设置的不同
+		MODE，我们判断去执行不同的方法。
+		"""
+        if self.mode == "AGENT":
+            "调用subprocess"
+            return self.__agent(cmd)
+        elif self.mode == "SSH":
+            return self.__ssh(cmd)
+        elif self.mode == "SALT":
+            return self.__salt(cmd)
+        else:
+            raise Exception('模式只能是AGENT/SSH/SALT')
+
+    def __agent(self, cmd):
+        """
+        单下划线：私有的，外部不能访问，外部也无需关心。
+        :param cmd:
+        :return:
+        """
+        output = subprocess.getoutput(cmd)
+        return output
+
+    def __ssh(self, cmd):
+        # private_key = paramiko.RSAKey.from_private_key_file(self.ssh_key)
+        # ssh = paramiko.SSHClient()
+        # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        # ssh.connect(hostname=self.hostname, port=self.ssh_port, username=self.ssh_user, pkey=private_key)
+        # stdin, stdout, stderr = ssh.exec_command(cmd)
+        # result = stdout.read()
+        # ssh.close()
+		"""
+		ssh存在两种方式，一种为账号密码端口，一种直接采用密钥。
+		"""
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(hostname=self.hostname, port=self.ssh_port, username=self.ssh_user, password=self.ssh_pwd)
+        stdin, stdout, stderr = ssh.exec_command(cmd)
+        result = stdout.read()
+        ssh.close()
+        return result
+
+    def __salt(self, cmd):
+        """
+        salt只能运行在python2中。python3支持不是很好。
+        所以在python3中可以使用subprocess来仿制一下salt
+        :param cmd:
+        :return:
+        """
+        # import salt.client
+        # local = salt.client.LocalClient()
+        # result = local.cmd(self.hostname, 'cmd.run', [cmd])
+        # return result[self.hostname]
+        salt_cmd = "salt '%s' cmd.run '%s'" % (self.hostname, cmd,)
+        output = subprocess.getoutput(salt_cmd)
+        return output
+```
+
+到此为止，整个插件调用的过程就写完了。最后exec_plugins会给我们把数据获取的所有字典给返回过来。接下来就是插件的具体实现。配置文件中我们配置了basic，我们就可以先来实现这个内容。假定MODE目前为agent模式，我们采用subprocess去调用。
+
+从插件调用的过程中，我们知道插件内部需要存在一个process方法。这里首先模拟一个数据，查看是否能够真正的拿到数据，最后真实的数据要通过subprocess模块动态的去获取。
+
+```python
+class Basic(object):
+    def __init__(self):
+        pass
+
+    def process(self, command_func, debug):
+        if debug:
+            output = {
+                'os_platform': "linux",
+                'os_version': "CentOS release 6.6 (Final)\nKernel \r on an \m",
+                'hostname': 'c1.com'
+            }
+        return output
+```
+
+在入口文件进行调用：
+
+```python
+import os
+import sys
+
+# 全局变量做赋值，这个只在当前的运行的应用程序的环境变量里
+# 运行完了就没了，这个并不影响其他的程序。
+os.environ['USER_SETTINGS'] = 'config.settings'
+# 因为要导入的src在start.py的上级目录下，因此首先将整个项目目录添加到path中。
+BASEDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASEDIR)
+
+
+# 引用集成的文件就可以拿到对应的配置文件了。
+from lib.conf.config import settings
+# 在导入的plugins模块的时候__init__.py文件会自动执行然后加载所有模块并拿到对应的返回值。
+from src.plugins import PluginManager
+
+if __name__ == '__main__':
+    server_info = PluginManager().exec_plugin()
+    print(server_info)
+```
+
+最后打印出来的结果如下，假如说我们添加了其他的插拔式组件的话，其他的组件内容也会被假如到这里面来。：
+
+```python
+{
+    'basic': {
+        'os_platform': 'linux', 
+        'os_version': 'CentOS release 6.6 (Final)\nKernel \r on an \\m', 
+        'hostname': 'c1.com'
+    }
+}
+```
+
+#### 针对可插拔插件预留钩子
+
+> 在上面的入口文件我们可以发现我们直接去实例化PluginManager然后调用exec_plugin方法，在这个过程中是依次去实例化每一个插件类，然后调用插件类的process方法。如果以后有这么一个需求，在实例化之前先去做一些什么操作的话这样现在的逻辑就不支持了。因此针对这个问题预留一个钩子。
+
+在每一个插件类中定义一个initial的类方法，通过这个方法实现实例化之前的一系列操作。
+
+```python
+class Basic(object):
+    def __init__(self):
+        pass
+
+    @classmethod
+    def initial(cls):
+        "这里可以写点实例化之前要做的操作。方便入口拓展"
+        return cls()
+
+    def process(self, command_func, debug):
+        …………………………
+        return output
+```
+
+然后在plugins中的`__init__.py`文件中进行判断对应的模块类中是否有这个方法。如下为对PluginManager中的exec_plugins方法的改进：
+
+```python
+def exec_plugin(self):
+    """
+    获取所有的插件，执行并获取插件的返回值
+    :return: 插件的返回值
+    """
+    response = {}
+    for k, v in self.plugin_dict.items():
+        # k = 'basic'
+        # v = "src.plugins.basic.Basic",
+        # rsplit表示从右面才是切割，1表示切一次
+        module_path, class_name = v.rsplit('.', 1)
+        m = importlib.import_module(module_path)
+        # 根据模块名去找类。
+        cls = getattr(m, class_name)
+        if hasattr(cls, 'initial'):
+            obj = cls.initial()
+        else:
+            # 根据v获取类，并执行其对应的process方法采集资产
+            obj = cls()
+        result = obj.process(self.command, self.debug)
+        response[k] = result
+    return response
+```
+
+#### 资产采集之错误堆栈信息
+
+上面的资产采集插件内容我们都是写死的，而实际过程中我们是需要去动态的获取的，比如这样：
+
+```python
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+import os
+
+
+class Basic(object):
+    def __init__(self):
+        pass
+
+    @classmethod
+    def initial(cls):
+        return cls()
+
+    def process(self, command_func, debug):
+        if debug:
+            output = {
+                'os_platform': command_func("uname").strip(),
+                'os_version': "Darwin 马晓雨的MBP 17.4.0 Darwin Kernel Version 17.4.0: Sun Dec 17 09:19:54 PST 2017; root:xnu-4570.41.2~1/RELEASE_X86_64 x86_64",
+                'hostname': '马晓雨的MBP'
+            }
+        else:
+            output = {
+                'os_platform': command_func("uname").strip(),
+                'os_version': command_func("cat /etc/issue").strip().split('\n')[0],
+                'hostname': command_func("hostname").strip(),
+            }
+        return output
+```
+
+这里设置一个debug其实就是方便调试，也就是拿我们写死的数据，如果非调试模式就是直接通过subprocess去执行命令拿返回值。那么执行命令就有可能存在执行失败报错，那么我们就需要捕获这个报错，因此针对执行命令的入口，PluginManager的exec_plugins方法进行修改：
+
+```python
+def exec_plugin(self):
+    response = {}
+    for k, v in self.plugin_dict.items():
+        # 在这里再套一个字典，设置data和status命令执行状态，默认执行成功，status为true
+        ret = {'status': True, 'data': None}
+        # 在结果获取的过程中设置try except去捕获可能出现的报错
+        try:
+            module_path, class_name = v.rsplit('.', 1)
+            m = importlib.import_module(module_path)
+            # 根据模块名去找类。
+            cls = getattr(m, class_name)
+            if hasattr(cls, 'initial'):
+                obj = cls.initial()
+            else:
+                obj = cls()
+            result = obj.process(self.command, self.debug)
+            ret['data'] = result
+        except Exception as e:
+            # 如果捕获到报错的话，那么获取结果状态设置为false，并且将错误堆栈信息记录到ret
+            ret['status'] = False
+            ret['data'] = "[%s][%s] 采集数据出现错误 : %s" %(self.hostname if self.hostname else "AGENT", k, traceback.format_exc())
+        response[k] = ret
+    return response
+```
+
+这里针对记录的错误堆栈信息不是单纯的打印exception捕获的e，这个e仅仅是错误内容，而我们需要的是把捕获到的整个堆栈信息全部都捕获到，确保用户知道出错了以后定位到某一个文件的具体某一个位置。
+
+#### 通过API获取采集的信息
+
+> - Agent模式
+>
+>   针对agent客户端模式，向API发送报告资产信息，比如agent多久采集一次，然后给api发送信息就可以了。发送过去直接采集入库。
+>
+> - SSH、SALT，存在中控机。
+>
+>   1. 首先来获取采集的主机列表
+>   2. 循环主机列表，采集资产，发送到API
+
+实现一个工具类，src/client.py。在书写这个之前，针对ssh和salt模式，当机器比较多的时候比如100台甚至更多的时候，如果通过for循环去一台一台的获取的话效率是很低的，因为这个过程是串行的，执行完一个再执行下一个，因此针对这个问题，可以采用多线程或者多进程去提高并发去处理，由于这个操作是IO（网络IO）密集型的，而不是计算密集型的，因此我们使用线程池就可以了。
+
+即使是多线程也不能无限制的开启，因为多线程的上下文切换也会有很多的损耗。因此我们要设置一个限制，使用线程池去控制开启的现成数量。针对python2和python3来说，python2只有进程池没有线程池，python3是既有线程池，也有进程池。来看一下线程池示例代码
+
+```python
+import time
+# 线程池和进程池的切换也很方便，切换个单词就行了
+from concurrent.futures import ThreadPoolExecutor
+# from concurrent.futures import ProcessPoolExecutor
+
+
+def task(i):
+    time.sleep(1)
+    print(i)
+
+
+# 最多开10个线程
+p = ThreadPoolExecutor(10)
+for row in range(100):
+    # 在线程池拿一个线程去执行，接收两个参数，一个任务名称，一个执行任务接收的参数
+    # 看打印结果我们就可以看到是十个十个出来的
+    p.submit(task, row)
+```
+
+将线程池应用到API获取工具类的SSHSALT部分。
+
+##### API实现代码
+
+```python
+import requests
+import json
+from src.plugins import PluginManager
+from lib.conf.config import settings
+from concurrent.futures import ThreadPoolExecutor
+
+
+class Base(object):
+	"""定义一个基类，定义基础向远程发送资产信息的方法，通过requests发送"""
+    def post_asset(self, server_info):
+        # 向远程地址发其实就是向API发，这个API可以先定义在settings配置文件中。
+        # 发什么？发server的数据，写json的话他会给你在内部做一个json.dumps转换成字符串
+        # request.body就是请求的原生值，request.post就是根据特殊的请求头部拿出来的内容
+        requests.post(settings.API, json=server_info)
+        # 因此我们发送的内容就放到了请求体里，同时设置了header请求头
+        # 这个时候request.post是没有值的，request.post只有在请求头是
+        # application/x-www-form-urlencoded的时候才会把内容放到request.post
+        # 并且在ajax提交的时候，key对应的value可以是字符串，数字，数组，但是不能是字典格式。
+        # 因此不能把我们提交的这个数据扔到request.post里去。
+        
+        # body: json.dumps(server_info)
+        # headers= {'content-type':'application/json'}
+        
+        # 那么再django后台取数据的时候只能用下面这种方法来取。
+        # request.body
+        # json.loads(request.body)
+
+class Agent(Base):
+
+    def execute(self):
+        server_info = PluginManager().exec_plugin()
+        self.post_asset(server_info)
+
+class SSHSALT(Base):
+    def get_host(self):
+        # 获取未采集的主机列表：
+        response = requests.get(settings.API)
+        # "{status:'True',data: ['c1.com','c2.com']}"
+        result = json.loads(response.text) 
+        if not result['status']:
+            return
+        return result['data']
+    
+    def run(self,host):
+        # 定义发送API信息的任务
+        server_info = PluginManager(host).exec_plugin()
+        self.post_asset(server_info)
+
+    def execute(self):
+		# 获取主机列表
+        host_list = self.get_host()
+        # 建立一个线程池，池子大小为10
+        pool = ThreadPoolExecutor(10)
+        for host in host_list:
+            # 循环并发执行采集信息任务
+            pool.submit(self.run, host)
+```
+
+使用一个脚本去调用api工具类：
+
+```python
+# src/script.py
+from lib.conf.config import settings
+from .client import Agent
+from .client import SSHSALT
+
+
+def run():
+    if settings.MODE == "AGENT":
+        obj = Agent()
+    else:
+        obj = SSHSALT()
+    obj.execute()
+```
+
+最后在入口文件start.py去调用：
+
+```python
+from src import script
+if __name__ == '__main__':
+    script.run()
+```
+
+**高内聚,低耦合**
+
+- 高内聚：一个功能在它自己内部全部完成。
+
+
+- 低耦合：插件和其他的没有关系，它自己是一个独立的整体。
+
+## 主机唯一标识
+
+认为主板的SN号，是唯一标识，不过针对的这个是物理机，也就是说如果是物理机的话那么就可以认为这个SN号是唯一的。如果是虚拟机的话分为虚要采集和不需要采集，如果需要采集的话那么就不能用SN号了，不然采集出来的SN号都是一样的。一堆虚拟机都是一样的SN号，这样做不到唯一的标识。
+
+**因此需要做标准化：**
+
+- 主机名的标准化：主机名不能重复，需要依赖本地文件
+  1. 新机装系统初始化软件，运行CMDB。
+     - 通过命令获取主机名
+     - 写入本地的指定的文件
+  2. 将资产信息发送给api
+  3. 获取资产信息
+     - 本地文件主机名 ≠ 命令获取的主机名（按照文件的主机名）
+     - 本地文件主机名 == 命令获取的文件主机名
+- 流程的标准化：
+  - 装机的时候，需要将服务信息录入CMDB
+    - 资产录入，机房，机柜，机柜位置
+    - 装机的时候，需要将服务信息录入CMDB，可以利用cobbler，这个时候已经知道主机名
+    - 资产采集，获取主机名，从cmdb找到然后添加数据。有就操作，没有就忽略操作。
+
+**最终流程：**
+
+- 标准化：主机名不重复，流程的标准化（装机的同时，主机名在cmdb中设置）
+
+**服务器资产采集（Agent）：**
+
+1. 第一次：文件不存在，或内容为空：
+2. 资产采集：
+   - 主机名写入文件
+   - 发送API
+3. 第n次：采集资产，主机名，从文件中获取。
+
+**SSH或者SALT（有中控机存在）：**
+
+- 中控机：获取未采集主机名列表：拿到主机名，采集主机信息然后返回。
+
+### 唯一标识的实现代码
+
+```python
+# 修改采集用户api信息工具类的Agent工具类部分
+class Agent(Base):
+
+    def execute(self):
+        server_info = PluginManager().exec_plugin()
+        # 首先获取到第一次的唯一标识，也就是主机名，这个就是新装系统的时第一次获取用于唯一标识
+        hostname = server_info['basic']['data']['hostname']
+        # 获取到的内容拟放在config目录下的cert文件中保存
+        certname = open(settings.CERT_PATH,'r',encoding='utf-8').read().strip()
+        # 如果打开的cert文件没有内容我们就把内容写进去
+        if not certname:
+            with open(settings.CERT_PATH,'w',encoding='utf-8') as f:
+                f.write(hostname)
+        else:
+            # 如果有内容还涉及到本地文件主机名和命令获取的主机名一致不一致的问题，
+            # 默认以文件获取的为准，因此就直接等于文件读取到的certname
+            # 所以你手动改了主机名也没事。因为有唯一的标准参考
+            server_info['basic']['data']['hostname'] = certname
+
+        self.post_asset(server_info)
+```
+
+
+
