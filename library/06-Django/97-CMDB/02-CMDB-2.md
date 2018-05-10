@@ -74,3 +74,13 @@ api采集的信息要入库，api要使用这些表，后台同时也会使用�
 python manage.py startapp repository
 ```
 
+### 资产入库
+
+
+
+
+
+
+
+### API验证
+

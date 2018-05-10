@@ -75,6 +75,9 @@
     - [redis事物](?file=03-DBA运维/02-Redis/07-redis事物 "redis事物")
     - [redis消息发布与订阅](?file=03-DBA运维/02-Redis/08-redis消息发布与订阅 "redis消息发布与订阅")
     - [redis主从](?file=03-DBA运维/02-Redis/09-redis主从 "redis主从")
+    - [Twitter-TwemProxy](?file=03-DBA运维/02-Redis/10-Twitter-TwemProxy "Twitter-TwemProxy")
+    - [redis3.x集群](?file=03-DBA运维/02-Redis/11-redis3.x集群 "redis3.x集群")
+    - [Redis运维注意事项](?file=03-DBA运维/02-Redis/15-Redis运维注意事项 "Redis运维注意事项")
 
 ##### Git
 - [初识git](?file=04-Git/01-初识git "初识git")
@@ -205,6 +208,9 @@
 - [Django模板](?file=06-Django/07-Django模板 "Django模板")
 - [Cookie和Session](?file=06-Django/08-Cookie和Session "Cookie和Session")
 - [Django安全](?file=06-Django/09-Django安全 "Django安全")
+- **CMDB**
+    - [CMDB-1](?file=06-Django/97-CMDB/01-CMDB-1 "CMDB-1")
+    - [CMDB-2](?file=06-Django/97-CMDB/02-CMDB-2 "CMDB-2")
 - **Django Blog**
     - [需求分析&DB设计](?file=06-Django/98-Django Blog/01-需求分析&DB设计 "需求分析&DB设计")
     - [首页](?file=06-Django/98-Django Blog/02-首页 "首页")
