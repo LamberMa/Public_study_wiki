@@ -1,1 +1,1 @@
-if(typeof AWPageMounts=='undefined'){AWPageMounts={}};AWPageMounts['m15']=[{"name":"01-Go开发环境搭建.md","path":"15-Go/01-Go开发环境搭建.md","content":"https://blog.csdn.net/wangshubo1989/article/details/55683812","timestamp":1525872754745}]
+if(typeof AWPageMounts=='undefined'){AWPageMounts={}};AWPageMounts['m15']=[{"name":"01-Go开发环境搭建.md","path":"15-Go/01-Go开发环境搭建.md","content":"https://blog.csdn.net/wangshubo1989/article/details/55683812","timestamp":1526030685669}]
