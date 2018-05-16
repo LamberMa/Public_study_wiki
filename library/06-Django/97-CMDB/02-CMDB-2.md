@@ -173,3 +173,9 @@ def asset(request):
 #### 为动态token添加时效
 
 首先说客户端其实每次发请求的时候都是结合自己的时间戳做字符串加密的，因此客户端每次发过来的加密的key应该都是不一样的。为了避免被
+
+
+
+
+
+AES加密：www.cnblogs.com/wupeiqi/articles/6746744.html

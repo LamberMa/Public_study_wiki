@@ -395,7 +395,12 @@ root         32  0.0  0.0  50844  1700 ?        R+   15:27   0:00 ps aux
 
 ### 使用supervisor管理进程
 #### 参考文档
-http://liyangliang.me/posts/2015/06/using-supervisor/
+
+> http://supervisord.org/
+>
+> http://liyangliang.me/posts/2015/06/using-supervisor/
+
+
 
 安装supervisor
 
@@ -409,3 +414,29 @@ http://liyangliang.me/posts/2015/06/using-supervisor/
 files = supervisord.d/*.ini
 
 ```
+
+
+
+
+```
+[program:sshd]
+command=/usr/sbin/sshd -D
+process_name=%(program_name)s
+autostart=true
+```
+
+
+
+```
+# docker容器统一使用supervisor进行管理，是管理操作标准化起来。
+[root@6dd90ccf92d0 ~]# ps -ef
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 18:01 ?        00:00:00 /usr/bin/python /usr/bin/supervisord -c /
+root         7     1  0 18:01 ?        00:00:00 /usr/sbin/sshd -D
+root         8     7  0 18:02 ?        00:00:00 sshd: root@pts/0
+root        10     8  0 18:02 pts/0    00:00:00 -bash
+root        23    10  0 18:03 pts/0    00:00:00 ps -ef
+[root@6dd90ccf92d0 ~]# supervisorctl status
+sshd                             RUNNING   pid 7, uptime 0:01:28
+```
+
