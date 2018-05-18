@@ -179,3 +179,12 @@ def asset(request):
 
 
 AES加密：www.cnblogs.com/wupeiqi/articles/6746744.html
+
+
+
+
+
+后台序列化操作:
+
+有两种，一种是django内置的，另外一种是重写json方法。
+
