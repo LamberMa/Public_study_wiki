@@ -229,6 +229,13 @@
 ##### Tornado
 
 ##### 自动化
+- **Cobbler**
+- **Saltstack**
+- **Ansible**
+- **Jenkins**
+    - [Jenkins部署与简单应用](?file=09-自动化/04-Jenkins/01-Jenkins部署与简单应用 "Jenkins部署与简单应用")
+    - [Jenkins回滚](?file=09-自动化/04-Jenkins/04-Jenkins回滚 "Jenkins回滚")
+    - [Jenkins File](?file=09-自动化/04-Jenkins/05-Jenkins File "Jenkins File")
 
 ##### 前端
 - **HTML**
