@@ -53,9 +53,9 @@ wget https://github.com/coreos/etcd/releases/download/v3.2.18/etcd-v3.2.18-linux
 
 ```shell
 [root@linux-node1 ssl]# cfssl gencert -ca=/opt/kubernetes/ssl/ca.pem \
->   -ca-key=/opt/kubernetes/ssl/ca-key.pem \
->   -config=/opt/kubernetes/ssl/ca-config.json \
->   -profile=kubernetes etcd-csr.json | cfssljson -bare etcd
+-ca-key=/opt/kubernetes/ssl/ca-key.pem \
+-config=/opt/kubernetes/ssl/ca-config.json \
+-profile=kubernetes etcd-csr.json | cfssljson -bare etcd
 2018/05/13 07:12:23 [INFO] generate received request
 2018/05/13 07:12:23 [INFO] received CSR
 2018/05/13 07:12:23 [INFO] generating key: rsa-2048
@@ -95,19 +95,19 @@ ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
 #ETCD_SNAPSHOT_COUNTER="10000"
 #ETCD_HEARTBEAT_INTERVAL="100"
 #ETCD_ELECTION_TIMEOUT="1000"
-ETCD_LISTEN_PEER_URLS="https://192.168.56.11:2380"
-ETCD_LISTEN_CLIENT_URLS="https://192.168.56.11:2379,https://127.0.0.1:2379"
+ETCD_LISTEN_PEER_URLS="https://192.168.56.101:2380"
+ETCD_LISTEN_CLIENT_URLS="https://192.168.56.101:2379,https://127.0.0.1:2379"
 #ETCD_MAX_SNAPSHOTS="5"
 #ETCD_MAX_WALS="5"
 #ETCD_CORS=""
 #[cluster]
-ETCD_INITIAL_ADVERTISE_PEER_URLS="https://192.168.56.11:2380"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="https://192.168.56.101:2380"
 # if you use different ETCD_NAME (e.g. test),
 # set ETCD_INITIAL_CLUSTER value for this name, i.e. "test=http://..."
-ETCD_INITIAL_CLUSTER="etcd-node1=https://192.168.56.11:2380,etcd-node2=https://192.168.56.12:2380,etcd-node3=https://192.168.56.13:2380"
+ETCD_INITIAL_CLUSTER="etcd-node1=https://192.168.56.101:2380,etcd-node2=https://192.168.56.102:2380,etcd-node3=https://192.168.56.103:2380"
 ETCD_INITIAL_CLUSTER_STATE="new"
 ETCD_INITIAL_CLUSTER_TOKEN="k8s-etcd-cluster"
-ETCD_ADVERTISE_CLIENT_URLS="https://192.168.56.11:2379"
+ETCD_ADVERTISE_CLIENT_URLS="https://192.168.56.101:2379"
 #[security]
 CLIENT_CERT_AUTH="true"
 ETCD_CA_FILE="/opt/kubernetes/ssl/ca.pem"
@@ -120,6 +120,8 @@ ETCD_PEER_KEY_FILE="/opt/kubernetes/ssl/etcd-key.pem"
 ```
 
 ## 创建ETCD系统服务
+
+centos7下面和centos6的系统启动管理脚本还是不太一样的，具体内容如下，设置完成以后不要着急启动，因为etcd会检查整个集群的健康状态，现在启动的话会一直卡住，等我们把所有的node节点都部署完成以后然后再进行启动。
 
 ```shell
 [root@linux-node1 ~]# vim /etc/systemd/system/etcd.service
@@ -137,6 +139,46 @@ Type=notify
 
 [Install]
 WantedBy=multi-user.target
+```
+
+## 重载系统服务
+
+```shell
+[root@linux-node1 ~]# systemctl daemon-reload
+[root@linux-node1 ~]# systemctl enable etcd
+```
+
+将配置文件分发到其他的节点并重载系统服务
+
+```shell
+scp /opt/kubernetes/cfg/etcd.conf 192.168.56.102:/opt/kubernetes/cfg/
+scp /etc/systemd/system/etcd.service 192.168.56.102:/etc/systemd/system/
+scp /opt/kubernetes/cfg/etcd.conf 192.168.56.103:/opt/kubernetes/cfg/
+scp /etc/systemd/system/etcd.service 192.168.56.103:/etc/systemd/system/
+```
+
+在所有节点上创建etcd存储目录并启动etcd
+
+```shell
+# 注意在执行这一部分之前务必要将其他的节点的etcd的配置文件部分的ip都改掉。
+mkdir /var/lib/etcd
+systemctl start etcd
+systemctl status etcd
+```
+
+
+
+## 验证集群
+
+```shell
+[root@linux-node1 ~]# etcdctl --endpoints=https://192.168.56.11:2379 \
+  --ca-file=/opt/kubernetes/ssl/ca.pem \
+  --cert-file=/opt/kubernetes/ssl/etcd.pem \
+  --key-file=/opt/kubernetes/ssl/etcd-key.pem cluster-health
+member 435fb0a8da627a4c is healthy: got healthy result from https://192.168.56.12:2379
+member 6566e06d7343e1bb is healthy: got healthy result from https://192.168.56.11:2379
+member ce7b884e428b6c8c is healthy: got healthy result from https://192.168.56.13:2379
+cluster is healthy
 ```
 
 
