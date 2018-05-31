@@ -126,12 +126,13 @@ WantedBy=multi-user.target
 ```
 
 ### 6.启动API Server服务
-```
+```shell
 # 如果服务压根没起来要去/var/log/messages下去查看错误日志。
-# kube-api监控6443端口，本地127.0.0.1监听8080端口是给scheler
-[root@linux-node1 ~]# systemctl daemon-reload
-[root@linux-node1 ~]# systemctl enable kube-apiserver
-[root@linux-node1 ~]# systemctl start kube-apiserver
+# kube-api监控6443端口，本地127.0.0.1监听8080端口是给scheduler，controller-manager使用的。别人要想访问的话就必须通过6443，就必须做验证。
+
+systemctl daemon-reload
+systemctl enable kube-apiserver
+systemctl start kube-apiserver
 ```
 
 查看API Server服务状态
@@ -172,6 +173,7 @@ WantedBy=multi-user.target
 
 ### 3.启动Controller Manager
 ```
+# 监听本地的10252端口(127.0.0.1)
 [root@linux-node1 ~]# systemctl daemon-reload
 [root@linux-node1 scripts]# systemctl enable kube-controller-manager
 [root@linux-node1 scripts]# systemctl start kube-controller-manager
@@ -207,6 +209,7 @@ WantedBy=multi-user.target
 
 ### 2.部署服务
 ```
+# 
 [root@linux-node1 ~]# systemctl daemon-reload
 [root@linux-node1 scripts]# systemctl enable kube-scheduler
 [root@linux-node1 scripts]# systemctl start kube-scheduler
@@ -245,7 +248,7 @@ WantedBy=multi-user.target
 ```
 
 3.生成 admin 证书和私钥：
-```
+```shell
 [root@linux-node1 ssl]# cfssl gencert -ca=/opt/kubernetes/ssl/ca.pem \
    -ca-key=/opt/kubernetes/ssl/ca-key.pem \
    -config=/opt/kubernetes/ssl/ca-config.json \
@@ -256,11 +259,11 @@ WantedBy=multi-user.target
 -rw------- 1 root root 1675 Mar  5 12:29 admin-key.pem
 -rw-r--r-- 1 root root 1399 Mar  5 12:29 admin.pem
 
-[root@linux-node1 src]# mv admin*.pem /opt/kubernetes/ssl/
+[root@linux-node1 src]# cp admin*.pem /opt/kubernetes/ssl/
 ```
 
 4.设置集群参数
-```
+```shell
 [root@linux-node1 src]# kubectl config set-cluster kubernetes \
    --certificate-authority=/opt/kubernetes/ssl/ca.pem \
    --embed-certs=true \
@@ -291,7 +294,17 @@ Context "kubernetes" created.
 Switched to context "kubernetes".
 ```
 
+做完了上面这一堆的配置以后其实是在家目录下的.kube目录下生成一个config文件，可以卡一下，kubectl就是通过这个文件来和kubeapiserver进行通信的。
+
+```shell
+[root@linux-node1 .kube]# ll config 
+-rw------- 1 root root 6261 May 30 06:12 config
+[root@linux-node1 .kube]# pwd
+/root/.kube
+```
+
 8.使用kubectl工具
+
 ```
 [root@linux-node1 ~]# kubectl get cs
 NAME                 STATUS    MESSAGE             ERROR
