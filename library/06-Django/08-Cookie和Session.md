@@ -144,242 +144,92 @@ def index(request):
 ```
 ### Session常用操作
 
-```
-del request.session['k1']
-这个删除的k1是cookie的随机字符串对应的session_data中的k1，而不是删除随机字符串。
+```python
+# 获取、设置、删除Session中数据
+request.session['k1']
+# 避免取不到报错的问题
+request.session.get('k1',None)
+request.session['k1'] = 123
+request.session.setdefault('k1',123) # 存在则不设置
 
-def index(request):
-    # 获取、设置、删除Session中数据
-    request.session['k1']
-    request.session.get('k1',None)
-    request.session['k1'] = 123
-    request.session.setdefault('k1',123) # 存在则不设置
-    del request.session['k1']
+# 这个删除的k1是cookie的随机字符串对应的session_data中的k1，而不是删除随机字符串。
+del request.session['k1'] 
  
-    # 所有 键、值、键值对
-    request.session.keys()
-    request.session.values()
-    request.session.items()
-    request.session.iterkeys()
-    request.session.itervalues()
-    request.session.iteritems()
- 
- 
-    # 用户session的随机字符串
-    request.session.session_key
- 
-    # 将所有Session失效日期小于当前日期的数据删除
-    request.session.clear_expired()
- 
-    # 检查 用户session的随机字符串 在数据库中是否
-    request.session.exists(request.session.session_key)
- 
-    # 删除当前用户的所有Session数据
-    request.session.delete(request.session.session_key)
- 
-    request.session.set_expiry(value)
-        * 如果value是个整数，session会在些秒数后失效。
-        * 如果value是个datatime或timedelta，session就会在这个时间后失效。
-        * 如果value是0,用户关闭浏览器session就会失效。
-        * 如果value是None,session会依赖全局session失效策略。
+# 所有 键、值、键值对，处理的都是对应的随机字符串的，不会影响到其他人的，我们不需要关注，因为django内部为我们做了系统的封装
+request.session.keys()
+request.session.values()
+request.session.items()
+request.session.iterkeys()
+request.session.itervalues()
+request.session.iteritems()
+
+# 用户session的随机字符串
+request.session.session_key
+
+# 我们知道django将session放在一个表中，数据库里不知道啥时候删除
+# 根据Django的规定，默认的情况下cookie会在浏览器保存两周。但是到期以后浏览器的cookie没了
+# 但是服务端的session还有啊，所以就得手动删除，其实在记录session的时候还会记录一个超时时间
+# 将所有Session失效日期小于当前日期的数据删除
+request.session.clear_expired()
+
+# 主动设置超时时间
+request.session.set_expiry(value)
+    * 如果value是个整数，session会在些秒数后失效。
+    * 如果value是个datatime或timedelta，session就会在这个时间后失效。
+    * 如果value是0,用户关闭浏览器session就会失效。
+    * 如果value是None,session会依赖全局session失效策略。
+
+# 检查 用户session的随机字符串 在数据库中是否
+request.session.exists(request.session.session_key)
+
+# 删除当前用户的所有Session数据
+request.session.delete(request.session.session_key)
 ```
 
-根据Django的规定，默认的情况下cookie会在浏览器保存两周
+### 缓存Session
 
-```
+```python
 a. 配置 settings.py
- 
-    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'  # 引擎
-    SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-    SESSION_CACHE_ALIAS = 'default'                            # 使用的缓存别名（默认内存缓存，也可以是memcache），此处别名依赖缓存的设置
- 
- 
-    SESSION_COOKIE_NAME ＝ "sessionid"                        # Session的cookie保存在浏览器上时的key，即：sessionid＝随机字符串
-    SESSION_COOKIE_PATH ＝ "/"                                # Session的cookie保存的路径
-    SESSION_COOKIE_DOMAIN = None                              # Session的cookie保存的域名
-    SESSION_COOKIE_SECURE = False                             # 是否Https传输cookie
-    SESSION_COOKIE_HTTPONLY = True                            
-    # 是否Session的cookie只支持http传输
-    
-    SESSION_COOKIE_AGE = 1209600                              
-    # Session的cookie失效日期（2周）
-    
-    SESSION_EXPIRE_AT_BROWSER_CLOSE = False                   
-    # 是否关闭浏览器使得Session过期
-    
-    SESSION_SAVE_EVERY_REQUEST = False                        
-    # 是否每次请求都保存Session，默认修改之后才保存
-    # False从一开始，这个时间段后超时。
-    # True每次请求都会计算，规定时间以内就不会超时。最好设置成True，让他每次都更新。
-    
-    
-    
-    
-SESSION_FILE_PATH = None
+# Django指定session存放的位置，默认是存放在数据库，这里其实是指定引擎
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+# 放到文件里，这时候要多个参数，指定放的路径。
 # 如果缓存文件路径为None，那么就使用tempfile模块获取一个临时地址
 # tempfile.gettempdir()
+SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+SESSION_FILE_PATH = None
 
-SESSION_ENGINE = 'django.crotrib.sessions.backends.signed_cookies'
-这个不要用，这相当于给cookies加了个签名，相当于不用session了。
+# 放到cache里，比如memcached，redis等。
+# 使用的缓存别名（默认内存缓存，也可以是memcache），此处别名依赖缓存的设置
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
 
+# 放到一个加密的cookie里。这个不要用，这相当于给cookies加了个签名，相当于不用session了。
+SESSION_ENGINE = 'django.crotrib.sessions.backends.signed_cookies'     
 
+# 使用缓存+数据库的方式，数据库用于做持久化，缓存用于提高效率
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'        
+ 
+# Session的cookie保存在浏览器上时的key，即：sessionid＝随机字符串
+SESSION_COOKIE_NAME ＝ "sessionid"
+SESSION_COOKIE_PATH ＝ "/"               # Session的cookie保存的路径
+SESSION_COOKIE_DOMAIN = None             # Session的cookie保存的域名
+SESSION_COOKIE_SECURE = False            # 是否Https传输cookie
+SESSION_COOKIE_HTTPONLY = True           # 是否Session的cookie只支持http传输
+SESSION_COOKIE_AGE = 1209600             # Session的cookie失效日期（2周），单位为秒
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # 是否关闭浏览器使得Session过期
+
+# 是否每次请求都保存Session，默认修改之后才保存，False从一开始，这个时间段后超时。
+# True每次请求都会计算，规定时间以内就不会超时。最好设置成True，让他每次都更新。
+# 想当于计时器在设置为true的时候会不断的刷新。
+SESSION_SAVE_EVERY_REQUEST = False                       
 ```
 
-Django指定session存放的位置，默认是存放在数据库。
+装饰器可以判断session存在不存在，其实和cookie一个套路。
 
+## Tip
 
-
-装饰器判断session存在不存在
-
-
-
-前端模板默认能拿到request这个模板变量
+前端模板默认能拿到request这个模板变量，注意这个用法。
 
 比如：request.session.userinfo.nickname
 
-
-
-# 开工第一天
-
-```python
-from django.db import models
-
-
-# Create your models here.
-class Boy(models.Model):
-    nickname = models.CharField(max_length=32)
-    username = models.CharField(max_length=32)
-    password = models.CharField(max_length=64)
-
-
-class Girl(models.Model):
-    nickname = models.CharField(max_length=32)
-    username = models.CharField(max_length=32)
-    password = models.CharField(max_length=64)
-
-
-class B2G(models.Model):
-    """
-    默认情况下这个to是省略的，默认就是对应的表
-    默认情况下这个to_field也是省略的，默认就是id字段。
-    """
-    b = models.ForeignKey(to='Boy', to_field='id', on_delete=models.CASCADE)
-    g = models.ForeignKey(to='Girl', to_field='id', on_delete=models.CASCADE)
-    
-当然这个是可以进行进一步优化的，男孩和女孩本质来讲其实都是用户，不需要拆开来看，只要构建一个新的用户表，加一个字段来控制性别就可以了。
-gender_choices = (
-	(1, '男'),
-    (2, '女'),
-)
-gender = models.IntegerField(choices=gender_choices)
-
-比如：
-class UserInfo(models.Model):
-    nickname = models.CharField(max_length=32)
-    username = models.CharField(max_length=32)
-    password = models.CharField(max_length=64)
-    gender_choices = (
-		(1, '男'),
-    	(2, '女'),
-	)
-	gender = models.IntegerField(choices=gender_choices)
-    
-    
-class U2U(models.Model):
-  # related_query_name可以让对象在反向查找的时候不用表名而是使用a或者b。相当于a_set.all()
-  # 如果不带query，反向查找就不带set了，就是直接a.all()，b.all()
-  g = models.ForeignKey('Userinfo', related_query_name='a')
-  b = models.ForeignKey('UserInfo', related_query_name='b')
-  
-这个在添加数据的时候又两种写法
-1、在能获取明确的id的值的时候就可以这么用。
-models.U2U.objects.create(b_id=2, g_id=6)
-2、如果可以拿到对象的化django也是可以支持插入对象的。
-boy = models.UserInfo.objects.filter(xxxx)
-girl = models.UserInfo.objects.filter(xxx)
-models.U2U.objects.create(b=boy, g=girl)
-
-或者：
-class UserInfo(models.Model):
-    nickname = models.CharField(max_length=32)
-    username = models.CharField(max_length=32)
-    password = models.CharField(max_length=64)
-    gender_choices = (
-		(1, '男'),
-    	(2, '女'),
-	)
-	gender = models.IntegerField(choices=gender_choices)
-    m = models.ManyToManyField('UserInfo')
-    
-如果设定的是manytomany的方式的话那么取数据的时候先后也有区别。
-上面的这个m在数据库中生成的字段名是from_userinfo_id和to_userinfo_id
-我们定前面的是男生的，后面的是女生的。那么取数据的时候就应该做如下修改：
-# 男生对象
-obj = models.UserInfo.objects.filter(id=1).first()
-# 根据男生id=1查找关联的所有女生
-obj.m.all()
-
-# 女生对象
-obj = models.UserInfo.objects.filter(id=4).first()
-# 根据女生id=4查找关联的所有男生
-obj.userinfo_set.all()
-```
-
-用户的注销：
-
-```python
-# 删除服务端的session数据，用户带着cookie来的话查不到数据
-request.session.delete(request.session.session_key)
-或者
-# 设置cookie超时
-request.session.clear()
-```
-
-Foreign自关联
-
-```python
-class Comment(models.Model):
-    """评论表"""
-    news_id = models.IntegerField() # 新闻id
-    content = models.CharField(max_length=32) # 评论的内容
-    user = models.CharField(max_length=32)   # 评论用户的id
-    # 首先这个评论的新闻是要存在的，这个要在已经存在的数据中去确认。
-    # 因此ForeignKey关联的表是自己。这个叫做ForeignKey的自关联
-    reply = models.ForeignKey('Comment', null=True, blank=True, related_name='xxxxx') # 评论回复
-```
-
-一般情况下的自关联是用不到的。
-
-
-
-Django:
-
-- 路由
-  - 单一路由
-  - 正则
-  - 可命名（反向生成）
-  - include分发
-- 视图
-  - CBV
-    - request
-    - render
-    - HttpResponse
-    - methodDecrators
-  - FBV
-- 数据库
-  - 基本数据库操作（增删改查）
-  - ​
-- 模板
-- 其他：
-  - CSRF
-  - Cookie
-  - Session
-  - 分页
-
-Django请求的生命周期：
-
-django默认使用的wsgi是wsgiref
-
-
-
-mvc & mtv(models（模型类）, templates（模板）,views（业务逻辑）)

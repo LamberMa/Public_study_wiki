@@ -210,6 +210,8 @@
 - [Python报错统计](?file=05-Python/99-Python报错统计 "Python报错统计")
 
 ##### Django
+- **常用组件**
+    - [验证码](?file=06-Django/00-常用组件/01-验证码 "验证码")
 - [Web框架的本质](?file=06-Django/01-Web框架的本质 "Web框架的本质")
 - [Django开篇](?file=06-Django/02-Django开篇 "Django开篇")
 - **Django ORM**
@@ -223,11 +225,13 @@
     - [02-Form生成HTML](?file=06-Django/05-Django Form/02-02-Form生成HTML "02-Form生成HTML")
     - [03-数据的提交](?file=06-Django/05-Django Form/03-03-数据的提交 "03-数据的提交")
     - [04-Form组件内部原理](?file=06-Django/05-Django Form/04-04-Form组件内部原理 "04-Form组件内部原理")
+    - [Form注册实例](?file=06-Django/05-Django Form/05-Form注册实例 "Form注册实例")
 - [Django模板](?file=06-Django/07-Django模板 "Django模板")
 - [Cookie和Session](?file=06-Django/08-Cookie和Session "Cookie和Session")
 - [Django安全](?file=06-Django/09-Django安全 "Django安全")
 - **RBAC**
     - [RBAC](?file=06-Django/10-RBAC/01-RBAC "RBAC")
+- [开工第一天](?file=06-Django/100-开工第一天 "开工第一天")
 - [Django-auth模块](?file=06-Django/11-Django-auth模块 "Django-auth模块")
 - **CMDB**
     - [CMDB-1](?file=06-Django/97-CMDB/01-CMDB-1 "CMDB-1")
@@ -236,7 +240,6 @@
     - [需求分析&DB设计](?file=06-Django/98-Django Blog/01-需求分析&DB设计 "需求分析&DB设计")
     - [首页](?file=06-Django/98-Django Blog/02-首页 "首页")
     - [文件的上传](?file=06-Django/98-Django Blog/08-文件的上传 "文件的上传")
-    - [验证码](?file=06-Django/98-Django Blog/09-验证码 "验证码")
     - [上传头像](?file=06-Django/98-Django Blog/10-上传头像 "上传头像")
 - [Django常见小问题](?file=06-Django/99-Django常见小问题 "Django常见小问题")
 
@@ -271,7 +274,7 @@
     - [CSS3](?file=10-前端/02-CSS/20-CSS3 "CSS3")
     - [常见样式布局](?file=10-前端/02-CSS/98-常见样式布局 "常见样式布局")
     - **CSS框架**
-        - [07、BootStrap](?file=10-前端/02-CSS/99-CSS框架/07-07、BootStrap "07、BootStrap")
+        - [BootStrap](?file=10-前端/02-CSS/99-CSS框架/01-BootStrap "BootStrap")
 - **原生JS**
     - [JS简介](?file=10-前端/03-原生JS/00-JS简介 "JS简介")
     - [ECMA对象](?file=10-前端/03-原生JS/01-ECMA对象 "ECMA对象")
