@@ -192,8 +192,9 @@
         - [可插拔式插件的设计](?file=05-Python/09-项目/01-01、CMDB/03-可插拔式插件的设计 "可插拔式插件的设计")
     - **02、CRM**
 - **最佳实践**
-    - [001-使用YAML作为项目的配置](?file=05-Python/11-最佳实践/001-001-使用YAML作为项目的配置 "001-使用YAML作为项目的配置")
-    - [002-VirtualEnv](?file=05-Python/11-最佳实践/002-002-VirtualEnv "002-VirtualEnv")
+    - [使用YAML作为项目的配置](?file=05-Python/11-最佳实践/01-使用YAML作为项目的配置 "使用YAML作为项目的配置")
+    - [VirtualEnv](?file=05-Python/11-最佳实践/02-VirtualEnv "VirtualEnv")
+    - [PipEnv](?file=05-Python/11-最佳实践/03-PipEnv "PipEnv")
 - **扩展阅读**
     - **算法图解读书笔记**
     - **编程思维**
@@ -225,7 +226,8 @@
     - [02-Form生成HTML](?file=06-Django/05-Django Form/02-02-Form生成HTML "02-Form生成HTML")
     - [03-数据的提交](?file=06-Django/05-Django Form/03-03-数据的提交 "03-数据的提交")
     - [04-Form组件内部原理](?file=06-Django/05-Django Form/04-04-Form组件内部原理 "04-Form组件内部原理")
-    - [Form注册实例](?file=06-Django/05-Django Form/05-Form注册实例 "Form注册实例")
+    - **05-Form注册实例**
+        - [Form组件定义](?file=06-Django/05-Django Form/05-05-Form注册实例/01-Form组件定义 "Form组件定义")
 - [Django模板](?file=06-Django/07-Django模板 "Django模板")
 - [Cookie和Session](?file=06-Django/08-Cookie和Session "Cookie和Session")
 - [Django安全](?file=06-Django/09-Django安全 "Django安全")
