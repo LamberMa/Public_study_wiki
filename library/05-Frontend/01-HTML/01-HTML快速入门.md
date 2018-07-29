@@ -1,8 +1,34 @@
 # HTML快速入门
 
-> 参考资料：http://www.cnblogs.com/yuanchenqi/articles/6835654.html
+> 参考资料：
+>
+> http://www.cnblogs.com/yuanchenqi/articles/6835654.html
+>
+> <http://www.cnblogs.com/liwenzhou/p/7988087.html> 
 
 ## 1-HTML基础
+
+### 1.0 Web服务的本质
+
+```python
+import socket
+
+
+sk = socket.socket()
+
+sk.bind(("127.0.0.1", 8080))
+sk.listen(5)
+
+
+while True:
+    conn, addr = sk.accept()
+    data = conn.recv(8096)
+    conn.send(b"HTTP/1.1 200 OK\r\n\r\n")
+    conn.secd(b"<h1>Hello world!</h1>")
+    conn.close()
+```
+
+浏览器发请求 --> HTTP协议 --> 服务端接收请求 --> 服务端返回响应 --> 服务端把HTML文件内容发给浏览器 --> 浏览器渲染页面
 
 ### 1.1 html是什么？
 
@@ -36,8 +62,10 @@ HTML 使用标记标签来描述网页
 
 标签的语法：
 
+```html
 <标签名 属性1=“属性值1” 属性2=“属性值2”……>内容部分</标签名>
 <标签名 属性1=“属性值1” 属性2=“属性值2”…… />
+```
 
 ### 1.5 常用标签
 
@@ -126,7 +154,7 @@ http://www.cnblogs.com/web-d/archive/2010/04/16/1713298.html
 - `<div></div>` ：` <div>`只是一个块级元素，并无实际的意义。主要通过CSS样式为其赋予不同的表现. 块级元素独占一行。
 - `<span></span>`：  `<span>`表示了内联行(行内元素),并无实际的意义,主要通过CSS样式为其赋予不同的表现. 非独占一行。
 
-块级元素与行内元素的区别
+**块级元素与行内元素的区别**
 所谓块元素，是以另起一行开始渲染的元素，行内元素则不需另起一行。如果单独在网页中插入这两个元素，不会对页面产生任何的影响。
 这两个元素是专门为定义CSS样式而生的。那么html的块级元素和行内元素都有哪些？以下内容仅供参考，实际上有用的没几个，看看就得了。
 
@@ -205,11 +233,27 @@ http://www.cnblogs.com/web-d/archive/2010/04/16/1713298.html
  　　* script - 客户端脚本
 ```
 
+**关于标签的嵌套**
+
+- 通常块级元素可以包含内联元素或某些块级元素，但内联元素不能包含块级元素，它只能包含其它内联元素。
+
+- p标签不能包含块级标签。如果你包含了会被隔开，它会把你p标签的开头和结尾给你自动闭合，中间的内容给你单独拿出来。比如：
+
+  ```html
+  # 比如你在代码中是这么写的。
+  <p><div></div></p>
+  
+  # 实际在网页中的显示会变为
+  <p></p>
+  <div>哈哈哈哈</div>
+  <p></p>
+  ```
+
 ##### img标签
 
 ```
 src: 要显示图片的路径.
-alt: 图片没有加载成功时的提示.
+alt: 图片没有加载成功时的提示.就算是图片加载失败是个×，你也能根据alt知道这是个什么图片。
 title: 鼠标悬浮时的提示信息.
 width: 图片的宽
 height:图片的高 (宽高两个属性只用一个会自动等比缩放.)
@@ -244,7 +288,14 @@ href属性指定目标网页地址。该地址可以有几种类型：
 
     绝对 URL - 指向另一个站点（比如 href="http://www.jd.com）
     相对 URL - 指当前站点中确切的路径（href="index.htm"）
-    锚 URL - 指向页面中的锚（href="#top"）
+    锚点 URL - 指向页面中的锚（href="#top"）就会跳转到对应的id为top的位置去。
+
+# 关于target
+_blank: 表示在新标签页中打开目标网页
+_self: 表示在当前标签页打开目标网页
+_parent: 在父框架集中打开被链接文档。
+_top: 在整个窗口中打开被链接文档。
+framename: 在指定的框架中打开被连接的文档
 ```
 
 ##### 列表
@@ -256,13 +307,193 @@ href属性指定目标网页地址。该地址可以有几种类型：
 <dl>  定义列表
          <dt> 列表标题
          <dd> 列表项
+             
+# 这个值得注意的就是这个有序列表的序标，比如是数字的，还是罗马的还是字母的？有这样一个标识
+type属性：
+
+1 数字列表，默认值
+A 大写字母
+a 小写字母
+Ⅰ 大写罗马
+ⅰ 小写罗马
+
+# Example
+<ol type="1" start="2">
+  <li>第一项</li>
+  <li>第二项</li>
+</ol>
 ```
 
 ##### 表格
 
+表格概念 表格是一个二维数据空间，一个表格由若干行组成，一个行又有若干单元格组成，单元格里可以包含文字、列表、图案、表单、数字符号、预置文本和其它的表格等内容。 表格最重要的目的是显示表格类数据。表格类数据是指最适合组织为表格格式（即按行和列组织）的数据。 表格的基本结构：
+
+```html
+<table>
+         <tr>
+                <td>标题</td>
+                <td>标题</td>
+         </tr>
+         
+         <tr>
+                <td>内容</td>
+                <td>内容</td>
+         </tr>
+</table>
+```
+
+table的属性
+
+```
+<tr>: table row
+<th>: table head cell
+<td>: table data cell
 
 
+属性: 注意，这里的是属性，而不是放在style里面的样式。
+    border: 表格边框.
+    cellpadding: 内边距
+    cellspacing: 外边距.
+    width: 像素 百分比.（最好通过css来设置长宽）
+    rowspan:  单元格竖跨多少行，设置在td上。
+    colspan:  单元格横跨多少列（即合并单元格）
+```
 
+##### form表单
+
+功能：表单用于向服务器传输数据，从而实现用户与Web服务器的交互。表单能够包含input系列标签，比如文本字段、复选框、单选框、提交按钮等等。表单还可以包含textarea、select、fieldset和 label标签。
+
+**表单属性**
+
+- action: 表单提交到哪.一般指向服务器端一个程序,程序接收到表单提交过来的数据（即表单元素值）作相应处理，比如https://www.sogou.com/web
+- method: 表单的提交方式 post/get默认取值就是get
+- target：规定action属性中地址的目标（默认：_self）
+- novalidate：标识不适用浏览器的验证功能。
+- name：规定识别表单的名称（对于DOM使用：document.forms.name）
+- enctype：规定被提交数据的编码默认为：url-encoded
+- autocomplete：规定浏览器开启自动补全（完成）表单，默认为on，可以手动修改为off
+- accept-charset：规定在被提交表单中使用的字符集（默认：页面字符集）
+
+**表单元素**
+
+> HTML表单是HTML元素中较为复杂的部分，表单往往和脚本、动态页面、数据处理等功能相结合，因此它是制作动态网站很重要的内容。 表单一般用来收集用户的输入信息 表单工作原理： 访问者在浏览有表单的网页时，可填写必需的信息，然后按某个按钮提交。这些信息通过Internet传送到服务器上。  服务器上专门的程序对这些数据进行处理，如果有错误会返回错误信息，并要求纠正错误。当数据完整无误后，服务器反馈一个输入完成的信息
+
+**input标签**
+
+| type属性值 | 表现形式     | 对应代码                                                     |
+| ---------- | ------------ | ------------------------------------------------------------ |
+| text       | 单行输入文本 | `<input type=text" />`                                       |
+| password   | 密码输入框   | `<input type="password"  />`                                 |
+| date       | 日期输入框   | `<input type="date" />`                                      |
+| checkbox   | 复选框       | `<input type="checkbox" checked="checked"  />`               |
+| radio      | 单选框       | `<input type="radio"  />`;记得不同的单选选项记得要让他们的name一致，否则会造成都能选的情况。 |
+| submit     | 提交按钮     | `<input type="submit" value="提交" />`                       |
+| reset      | 重置按钮     | `<input type="reset" value="重置"  />`                       |
+| button     | 普通按钮     | `<input type="button" value="普通按钮"  />`                  |
+| hidden     | 隐藏输入框   | `<input type="hidden"  />`                                   |
+| file       | 文件选择框   | `<input type="file"  />`；form表单需要加上属性enctype="multipart/form-data" |
+
+```
+button 按钮(需要配合js使用.) button和submit的区别？
+
+# Tip
+
+1 请求方式必须是post
+2 enctype="multipart/form-data"
+
+表单属性
+
+name:    表单提交项的键.
+
+           注意和id属性的区别：name属性是和服务器通信时使用的名称；
+           而id属性是浏览器端使用的名称，该属性主要是为了方便客户端编程，而在css和javascript中使用的
+
+value:    表单提交项的值.对于不同的输入类型，value 属性的用法也不同：
+
+                type="button", "reset", "submit" - 定义按钮上的显示的文本
+                 
+                type="text", "password", "hidden" - 定义输入字段的初始值
+                 
+                type="checkbox", "radio", "image" - 定义与输入相关联的值
+
+
+checked:  radio 和 checkbox 默认被选中
+
+readonly: 只读. text 和 password
+
+disabled: 对所用input都好使.
+```
+
+**select标签**
+
+```html
+<select> 下拉选标签属性
+
+
+          name:表单提交项的键.
+
+          size：选项个数
+
+          multiple：multiple 
+                 <optgroup>为每一项加上分组
+
+                 <option> 下拉选中的每一项 属性：
+
+                       value:表单提交项的值.   
+                       selected: selected下拉选默认被选中
+                     
+                     
+# 示例
+<form action="" method="post">
+  <select name="city" id="city">
+    <option value="1">北京</option>
+    <option selected="selected" value="2">上海</option>
+    <option value="3">广州</option>
+    <option value="4">深圳</option>
+  </select>
+</form>
+```
+
+**`<textarea>` 多行文本框**
+
+```
+<form id="form1" name="form1" method="post" action="">
+        <textarea cols=“宽度” rows=“高度” name=“名称”>
+                   默认内容
+        </textarea>
+</form>
+- name：名称
+- rows：行数
+- cols：列数
+- disabled：禁用
+```
+
+**`<label>`标签**
+
+定义：`<label>` 标签为 input 元素定义标注（标记）。 
+
+说明： 
+
+1. label 元素不会向用户呈现任何特殊效果。
+2.  `<label>` 标签的 for 属性值应当与相关元素的 id 属性值相同。此时点击lable，同时input也会被聚焦。
+
+```html
+<form method="post" action="">
+
+        <label for=“username”>用户名</label>
+        <input type=“text” name=“username” id=“username” size=“20” />
+</form>
+```
+
+**`<fieldset>`标签**
+
+```html
+<!--这个基本上是不怎么用的，我们都是自己布局加样式的，所以这个了解就好，就是一种把input框包起来的效果-->
+<fieldset>
+    <legend>登录吧</legend>
+    <input type="text">
+</fieldset>
+```
 
 
 

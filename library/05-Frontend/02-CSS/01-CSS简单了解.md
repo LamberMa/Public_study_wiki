@@ -2,6 +2,12 @@
 
 [TOC]
 
+## 0、CSS介绍
+
+CSS（**C**ascading **S**tyle **S**heet，层叠样式表)定义**如何显示**HTML元素。
+
+当浏览器读到一个样式表，它就会按照这个样式表来对文档进行格式化（渲染）。
+
 ## 1、选择器
 
 ```css
@@ -184,10 +190,41 @@ p{color:green}
 
 样式表中的特殊性描述了不同规则的相对权重，它的基本规则是：
 
+```
+# 选择器的特殊性分为四个等级，分别为a,b,c,d
+- 如果样式是行内样式那么a=1，对应的权重为1000(a=1,b=0,c=0,c=0)
+- b表示ID选择器的个数，有一个id选择器那么b=1,有两个就是2，那么对应的权重就是0100或0200
+- c等于类，伪类和属性选择器的数量。比如有一个对应的权重就是0010
+- d等于类型选择器（其实就是标签选择器）和伪元素选择器的数量。比如有一个就是0001
+```
+
 - 内联样式表的权值最高                       style=""－－－－－－－－－－－－1000；
 - 统计选择符中的ID属性个数。           #id －－－－－－－－－－－－－－100
 - 统计选择符中的CLASS属性个数。    .class －－－－－－－－－－－－－10
 - 统计选择符中的HTML标签名个数。 p －－－－－－－－－－－－－-－1
+
+```html
+1、#content div#main-content h2{}  
+2、#content #main-content>h2{}     
+3、body #content div[id="main-content"] h2{}
+4、#main-content div.new-story h2{}
+5、#main-content [class="new-story"] h2{}
+6、div#main-content div.new-story h2.first{}
+
+<!--对应的html代码-->
+<div id="content">
+    <div id="main-content">
+        <h2>Strange Times</h2>
+        <p>balabalabala</p>
+        <div class="new-story">
+            <h2 class="first">Bog Snorkeling Champion………………</h2>
+            <p>balabalabala</p>
+        </div>
+    </div>
+</div>
+
+# 问题为两个标题都会按照序号几的样式去设置？答案是1
+```
 
 按这些规则将数字符串逐位相加，就得到最终的权重，然后在比较取舍时按照从左到右的顺序逐位比较。
 
@@ -211,6 +248,12 @@ p{color:green}
 ### 2.3、CSS的文本属性
 
 #### 水平对齐方式&文本属性
+
+文本的颜色，可以通过下面这三种方式设置。：
+
+- 十六进制值 - 如: **＃**FF0000
+- 一个RGB值 - 如: RGB(255,0,0)
+- 颜色的名称 - 如:  red
 
 text-align 属性规定元素中的文本的水平对齐方式。
 
