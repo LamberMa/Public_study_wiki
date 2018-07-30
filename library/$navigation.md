@@ -11,6 +11,8 @@
         - [Tomcat目录结构](?file=01-Linux运维/01-常用服务搭建/01-Tomcat/002-Tomcat目录结构 "Tomcat目录结构")
         - [Tomcat的日志](?file=01-Linux运维/01-常用服务搭建/01-Tomcat/003-Tomcat的日志 "Tomcat的日志")
         - [Tomcat配置https](?file=01-Linux运维/01-常用服务搭建/01-Tomcat/006-Tomcat配置https "Tomcat配置https")
+    - **Haproxy**
+        - [Haproxy介绍&部署](?file=01-Linux运维/01-常用服务搭建/02-Haproxy/01-Haproxy介绍&部署 "Haproxy介绍&部署")
     - **LNMP**
         - [概念性的问题](?file=01-Linux运维/01-常用服务搭建/06-LNMP/001-概念性的问题 "概念性的问题")
         - [认识Nginx](?file=01-Linux运维/01-常用服务搭建/06-LNMP/002-认识Nginx "认识Nginx")
@@ -247,6 +249,7 @@
     - [RBAC](?file=04-Django/10-RBAC/01-RBAC "RBAC")
 - [开工第一天](?file=04-Django/100-开工第一天 "开工第一天")
 - [Django-auth模块](?file=04-Django/11-Django-auth模块 "Django-auth模块")
+- [rabbitmq](?file=04-Django/12-rabbitmq "rabbitmq")
 - **项目实战**
     - **01、CMDB**
         - [CMDB简介](?file=04-Django/50-项目实战/01-01、CMDB/01-CMDB简介 "CMDB简介")
@@ -269,21 +272,23 @@
         - [01-开发环境介绍](?file=05-Frontend/01-HTML/00-开发环境介绍/01-01-开发环境介绍 "01-开发环境介绍")
         - [02-Emmet简单实用介绍](?file=05-Frontend/01-HTML/00-开发环境介绍/02-02-Emmet简单实用介绍 "02-Emmet简单实用介绍")
     - [HTML快速入门](?file=05-Frontend/01-HTML/01-HTML快速入门 "HTML快速入门")
+    - [HTML5新特性](?file=05-Frontend/01-HTML/02-HTML5新特性 "HTML5新特性")
 - **CSS**
     - [CSS简单了解](?file=05-Frontend/02-CSS/01-CSS简单了解 "CSS简单了解")
     - [CSS盒模型](?file=05-Frontend/02-CSS/02-CSS盒模型 "CSS盒模型")
     - [浮动](?file=05-Frontend/02-CSS/03-浮动 "浮动")
-    - [定位](?file=05-Frontend/02-CSS/04-定位 "定位")
-    - [行高](?file=05-Frontend/02-CSS/05-行高 "行高")
     - [vertical-align](?file=05-Frontend/02-CSS/06-vertical-align "vertical-align")
-    - [CSS中的伪类和伪元素](?file=05-Frontend/02-CSS/07-CSS中的伪类和伪元素 "CSS中的伪类和伪元素")
     - [CSS3](?file=05-Frontend/02-CSS/20-CSS3 "CSS3")
     - [常见样式布局](?file=05-Frontend/02-CSS/98-常见样式布局 "常见样式布局")
     - **CSS框架**
         - [BootStrap](?file=05-Frontend/02-CSS/99-CSS框架/01-BootStrap "BootStrap")
 - **原生JS**
-    - [JS简介](?file=05-Frontend/03-原生JS/00-JS简介 "JS简介")
-    - [ECMA对象](?file=05-Frontend/03-原生JS/01-ECMA对象 "ECMA对象")
+    - [JS基础](?file=05-Frontend/03-原生JS/01-JS基础 "JS基础")
+    - [JS流程判断](?file=05-Frontend/03-原生JS/02-JS流程判断 "JS流程判断")
+    - [循环](?file=05-Frontend/03-原生JS/03-循环 "循环")
+    - [DOM&BOM](?file=05-Frontend/03-原生JS/04-DOM&BOM "DOM&BOM")
+    - [其他](?file=05-Frontend/03-原生JS/10-其他 "其他")
+    - [asxasx](?file=05-Frontend/03-原生JS/11-asxasx "asxasx")
 - **Jquery**
 - **Ajax**
     - [Ajax入门](?file=05-Frontend/05-Ajax/01-Ajax入门 "Ajax入门")

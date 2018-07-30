@@ -1,5 +1,9 @@
 ## CSS简单使用
 
+>http://www.cnblogs.com/yuanchenqi/articles/6856399.html
+>
+>http://www.cnblogs.com/liwenzhou/p/7999532.html
+
 [TOC]
 
 ## 0、CSS介绍
@@ -249,12 +253,6 @@ p{color:green}
 
 #### 水平对齐方式&文本属性
 
-文本的颜色，可以通过下面这三种方式设置。：
-
-- 十六进制值 - 如: **＃**FF0000
-- 一个RGB值 - 如: RGB(255,0,0)
-- 颜色的名称 - 如:  red
-
 text-align 属性规定元素中的文本的水平对齐方式。
 
 - left      把文本排列到左边。默认值：由浏览器决定。
@@ -307,6 +305,8 @@ letter-spacing: 10px;  字母间距
 word-spacing: 20px;  单词间距
 text-transform: capitalize/uppercase/lowercase ; 文本转换，用于所有字句变成大写或小写字母，或每个单词的首字母大写
 ```
+
+如果想要一个简单的居中可以使用line-height=容器的高，这样是上下垂直居中。然后text-align的值是center可以让你的文本左右水平居中。
 
 ### 2.4、CSS的样式了解
 
@@ -426,9 +426,9 @@ border-bottom: 3px solid yellow;
 
 ```css
 list-style-type         设置列表项标志的类型。（一般设置为None）
-list-style-image    将图象设置为列表项标志。
-list-style-position 设置列表中列表项标志的位置。
-list-style          简写属性。用于把所有用于列表的属性设置于一个声明中（一般设置为None）
+list-style-image        将图象设置为列表项标志。取代默认的样式
+list-style-position     设置列表中列表项标志的位置。
+list-style              简写属性。用于把所有用于列表的属性设置于一个声明中（一般设置为None）
 ```
 
 list-style-type属性指定列表项标记的类型：
@@ -440,6 +440,7 @@ ul { list-style-type: square; }
 使用图像来替换列表项的标记:
 
 ```css
+# 基本上用的非常少
 ul {
      list-style-image: url('');
 }
@@ -453,7 +454,7 @@ ul {
   p{display:none;}
 
   注意与visibility:hidden的区别：
-  visibility:hidden可以隐藏某个元素，但隐藏的元素仍需占用与未隐藏之前一样的空间。也就是说，该元素虽然被隐藏了，但仍然会影响布局。
+  visibility:hidden可以隐藏某个元素，但隐藏的元素仍需占用与未隐藏之前一样的空间。也就是说，该元素虽然被隐藏了，但仍然会影响布局。相当于虽然不显示了，但是仍然会占一个坑。
   display:none可以隐藏某个元素，且隐藏的元素不会占用任何空间。也就是说，该元素不但被隐藏了，而且该元素原本占用的空间也会从页面布局中消失。
   ```
 
@@ -491,7 +492,7 @@ float：left|right|none|inherit
 
 浮动的定义：使元素脱离文档流，按照指定方向发生移动，遇到父级边界或者相邻的浮动元素停下来
 
-浮动的顺序是按照元素在页面从上到下的顺序加载的。
+浮动的顺序是按照元素在页面从上到下的顺序加载的。浮动元素会去判断上一个元素是否是浮动的，如果是浮动的那么我就紧贴着你，如果不是浮动的块级元素那我就垂直顶着你，如果不是浮动的内联元素比如span这种会被挤到一边去。
 
 浮动的基本特征：
 
@@ -514,13 +515,28 @@ float：left|right|none|inherit
 
 clear：left|right|both|none|inherit
 
-元素在某个方向上不能有浮动元素，clear both指的是两侧均不予许有浮动元素。
+元素在某个方向上不能有浮动元素，clear both指的是两侧均不予许有浮动元素。注意clear影响的是元素自己本身，比如我不允许我的左侧有浮动，那么肯定是影响的我自己，而不是把别人给挪走。比如我左边有浮动元素，我clear left，那么肯定是我走，我不能影响其他人的。
 
+float会覆盖div但是不会影响文字
 
+#### overflow
 
-## 3、简单的PS抠图
+- overflow: hidden
 
+  ```
+  当内容的高度超过容器设置的高度以后会溢出，因此有时候我们会去设置这个overflow-hidden这个参数，让它隐藏，被隐藏的部分可以以滚动条的形式查看。但是拥有overflow:hidden样式的块元素内部的元素溢出并不总是被隐藏，具体来说，需要同时满足以下条件：
+  
+  - 有overflow:hidden样式的块元素不具有position:relative和position:absolute样式；
+  - 内部溢出的元素是通过position:absolute绝对定位；
+  
+  overflow：hidden的含义是超出的部分要裁切隐藏，float的元素虽然不在普通流中，但是他是浮动在普通流之上的，可以把普通流元素+浮动元素想象成一个立方体。如果没有明确设定包含容器高度的情况下，它要计算内容的全部高度才能确定在什么位置hidden，这样浮动元素的高度就要被计算进去。这样包含容器就会被撑开，清除浮动。
+  ```
 
-
-## 4、网易新闻小结构案例
+| 值      | 描述                                                     |
+| ------- | -------------------------------------------------------- |
+| visible | 默认值。内容不会被修剪，会呈现在元素框之外。             |
+| hidden  | 内容会被修剪，并且其余内容是不可见的。                   |
+| scroll  | 内容会被修剪，但是浏览器会显示滚动条以便查看其余的内容。 |
+| auto    | 如果内容被修剪，则浏览器会显示滚动条以便查看其余的内容。 |
+| inherit | 规定应该从父元素继承 overflow 属性的值。                 |
 

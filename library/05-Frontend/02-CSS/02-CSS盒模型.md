@@ -1,12 +1,29 @@
 # CSS盒模型
 
-## 伪类
-伪类专用于控制链接的显示效果
+[TOC]
+
+## 伪类&伪元素
+
+> 参考内容:
+>
+> https://blog.csdn.net/ansenamerson/article/details/71250093
+>
+> 伪元素特效应用：
+>
+> https://www.jb51.net/css/461830.html
+>
+> https://blog.csdn.net/natalie86/article/details/44656247
+
+### 伪类
+
+伪类包含两种，状态伪类和结构性伪类，状态伪类专用于控制链接的显示效果。
+
 ```css
 a:link（没有接触过的链接）,用于定义了链接的常规状态。
 a:hover（鼠标放在链接上的状态）,用于产生视觉效果。
 a:visited（访问过的链接）,用于阅读文章，能清楚的判断已经访问过的链接。
 a:active（在链接上按下鼠标时的状态）,用于表现鼠标按下时的链接状态。
+a:focus 应用于用于键盘输入焦点的元素
 
 伪类选择器 : 伪类指的是标签的不同状态:
 a ==> 点过状态 没有点过的状态 鼠标悬浮状态 激活状态
@@ -14,6 +31,32 @@ a:link {color: #FF0000} /* 未访问的链接 */
 a:visited {color: #00FF00} /* 已访问的链接 */
 a:hover {color: #FF00FF} /* 鼠标移动到链接上 */
 a:active {color: #0000FF} /* 选定的链接 */ 格式: 标签:伪类名称{ css代码; }
+```
+
+结构性伪类是CSS3新增的选择器，比如，具体内容可以移步到css3章节查看：
+
+```css
+E:nth-last-child(n) 表示E父元素中的第n个子节点，从后往前计算
+E:nth-of-type(n) 表示E父元素中的第n个子节点，类型为E
+E:nth-last-of-type(n) 表示E父级元素中的第n个子节点，类型为E，从后往前计算
+E:empty 表示匹配E元素中没有子节点的，并且里面没有内容的。其实就是找一个空标签，有文字不行，在这里文字也算一个节点。
+E:first-child 表示E元素中的第一个子节点，相当于nth-child(1)
+E:last-child 表示E元素中的最后一个子节点，相当于nth-last-child(1)
+E:first-of-type 表示E父元素中的第一个子节点且节点类型为E的，等价于nth-of-type(1)
+E:last-of-type 表示E父元素中的最后一个子节点且节点类型为E的，等价于nth-last-of-type(1)
+E:only-child 表示E元素中只有一个子节点，注意：子节点不包含文本节点
+E:only-of-type：表示E的父元素只有一个子节点，且这个唯一的子节点类型必须是E，注意子节点不包含文本节点
+```
+
+### 伪元素
+
+**伪元素**是对元素中的特定内容进行操作，而不是描述状态。它的操作层次比伪类更深一层，因此动态性比伪类低很多。实际上，伪元素就是选取某些元素前面或后面这种普通选择器无法完成的工作。控制的内容和元素是相同的，但它本身是基于元素的抽象，并不存在于文档结构中！常见的伪元素选择器包括：
+
+```
+:first-letter 选择元素文本的第一个字（母）。
+:first-line 选择元素文本的第一行。
+:before 在元素内容的最前面添加新内容。
+:after 在元素内容的最后面添加新内容。
 
 # 动态的添加内容
 p:after{
@@ -23,6 +66,8 @@ p:after{
 
 p:before
 ```
+
+单冒号(:)用于 CSS3 伪类，双冒号(::)用于 CSS3 伪元素。对于 CSS2 中已经有的伪元素，例如 :before，单冒号和双冒号的写法 ::before 作用是一样的。目的其实是为了区分伪类和伪元素，而且大部分的浏览器都是识别这种标识方法的。
 
 示例：
 
@@ -68,20 +113,83 @@ p:before
 </html>
 ```
 
+### 伪元素的应用
 
+#### 给首字母设置特殊样式
 
+```css
+p:first-letter {
+  font-size: 48px;
+  color: red;
+}
+```
 
+#### 清浮动
 
-如果想要一个简单的居中可以使用line-height=容器的高，然后text-align的值是center
+```css
+.clear:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+```
 
+#### 画分割线
 
+```html
+<style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+    .spliter::before, .spliter::after {
+      content: '';
+      display: inline-block;
+      border-top: 1px solid black;
+      width: 200px;
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <p class="spliter">分割线</p>
+</body>
+```
 
-overflow-hidden
+#### 做一个消息气泡
 
-当内容的高度超过容器设置的高度以后会溢出，因此有时候我们会去设置这个overflow-hidden这个参数，让它隐藏，被隐藏的部分可以以滚动条的形式查看。但是拥有overflow:hidden样式的块元素内部的元素溢出并不总是被隐藏，具体来说，需要同时满足以下条件：
+```html
+<head>
+    <style>
+        #bubble{
+            position: relative;
+            width:300px;
+            height:150px;
+            background-color: #5bc0de;
+            margin: 200px auto;
+            border-radius: 10px;
+        }
+        #bubble:before{
+            position: absolute;
+            content: '';
+            width: 0;
+            height: 0;
+            right: 100%;
+            top: 60px;
+            border-top: 15px solid transparent;
+            border-right: 30px solid #000;
+            border-bottom: 15px solid transparent;
+        }
+    </style>
+</head>
+<body>
 
-- 有overflow:hidden样式的块元素不具有position:relative和position:absolute样式；
-- 内部溢出的元素是通过position:absolute绝对定位；
+<div id="bubble"></div>
+```
+
+![](http://omk1n04i8.bkt.clouddn.com/18-7-30/35449268.jpg)
+
+伪元素的本质是在不增加dom结构的基础上添加的一个元素，在用法上跟真正的dom无本质区别。普通元素能实现的效果，伪元素都可以。有些用伪元素效果更好，代码更精简。
 
 ## 盒模型
 
@@ -166,7 +274,8 @@ body{
 上面div的margin-bottom和下面div的margin-top会塌陷，也就是会取上下两者margin里最大值作为显示值（塌陷的重叠只会针对上下，不针对左右。）
 
 2、父子div：
-if 父级div中没有border，padding，inlinecontent，子级div的margin会一直向上找，直到找到某个标签包括border，padding，inline content中的其中一个，然后按此div 进行margin；
+
+如果父级div中没有border，padding，inlinecontent，子级div的margin会一直向上找，直到找到某个标签包括border，padding，inline content中的其中一个，然后按此div 进行margin；
 
 示例：
 
@@ -223,14 +332,6 @@ if 父级div中没有border，padding，inlinecontent，子级div的margin会一
 ```css
 overflow: hidden;　　
 ```
-
-
-
-
-
-
-
-float会覆盖div但是不会影响文字
 
 ## CSS中的定位（position）
 
@@ -410,6 +511,138 @@ opacity:0~1; 1表示不透明，0表示完全透明。这个内容是默认继�
 			<div class="mark"></div>
 		</div>
 	</body>
+</html>
+```
+
+## Tip
+
+### 默认高度和宽度的问题
+
+（1）父子都是块级元素
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>fortest</title>
+    <style>
+        div.parent{
+            width: 500px;
+            height: 300px;
+            background: #ccc;
+        }
+        div.son{
+            width: 100%;
+            height: 200px;
+            background: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="parent">
+        <div class="son"></div>
+    </div>
+</body>
+</html>
+```
+
+这时，子元素设置为了父元素width的100%，那么子元素的宽度也是500px；但是如果我们把子元素的width去掉之后，就会发现子元素还是等于父元素的width。**也就是说，对于块级元素，子元素的宽度默认为父元素的100%。**
+
+> **当我们给子元素添加padding和margin时，可以发现宽度width是父元素的宽度减去子元素的margin值和padding值。**
+
+**毫无疑问，如果去掉子元素的height，就会发先子元素的高度为0，故height是不会为100%的，**一般我们都是通过添加内容（子元素）将父元素撑起来。
+
+（2）父：块级元素  子：内联元素
+
+如果内联元素是不可替换元素（除img，input以外的一般元素），元素是没有办法设置宽度的，也就谈不上100%的问题了。 即内联元素必须依靠其内部的内容才能撑开。
+
+如果内联元素是可替换元素（img，input，本身可以设置长和宽），**不管怎么设置父元素的宽度和高度，而不设置img的宽和高时，img总是表现为其原始的宽和高。**
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>...</title>
+    <style>
+        div.parent{
+            width: 500px;
+            height: 300px;
+            background: #ccc;
+        }
+        img{
+            height: 100px;
+            background: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="parent">
+        <img class="son" src="s1.jpg"></img>
+    </div>
+</body>
+</html>
+```
+
+由此我们可以发现，虽然没有设置宽度，但是表现在浏览器上为160px，它并没有继承父元素的100%得到500px，而是根据既定的高度来等比例缩小宽度。  同样， 如果只设置width，那么height也会等比例改变。   如果我们把img的width设置为100%，就可以发现其宽度这时就和父元素的宽度一致了。而我们一般的做法时，首先确定img的父元素的宽度和高度，然后再将img的宽度和高度设置为100%，这样，图片就能铺满父元素了。
+
+## 后台布局框架
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+
+        .pg-header{
+           height: 48px;
+           width: 100%;
+           background-color: #2459a2;
+           position: fixed;
+           top:0;
+           left: 0;
+        }
+        .left{
+            position:absolute;
+            left:0;
+            top:48px;
+            bottom:0;
+            width:200px;
+            background-color: #ededed;
+        }
+
+        .right{
+            position:absolute;
+            right:0;
+            left:200px;
+            top:48px;
+            bottom:0;
+            overflow:auto;
+
+        }
+        .content{
+            height: 2000px;
+            width: 100%;
+           
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="pg-header"></div>
+<div>
+    <div class="left">
+
+    </div>
+    <div class="right">
+      <div class="content"></div>
+    </div>
+</div>
+
+</body>
 </html>
 ```
 
