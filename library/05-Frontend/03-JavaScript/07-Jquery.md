@@ -641,8 +641,13 @@ $(document).ready(function() {
 *CSS位置操作*
 
 ```javascript
-# offset获取的是当前视口的相对偏移。
+# offset获取的是当前视口的相对偏移。var $xxx=$('xxx').offset()拿到的是一个对象。
+# 有left属性，top属性等等。
 $("").offset([coordinates])
+# offset赋值操作
+$('.p1').offset({left:300,top:200})
+
+# 相当于已定位的父级的位置
 $("").position()
 $("").scrollTop([val])
 $("").scrollLeft([val])
