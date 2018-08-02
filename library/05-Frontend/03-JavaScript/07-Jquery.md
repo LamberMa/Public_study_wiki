@@ -1,6 +1,6 @@
 www.cnblogs.com/yuanchenqi/articles/6870763.html
 
-jquery
+# Jquery
 
 > http://jquery.cuishifeng.cn/
 >
@@ -156,7 +156,11 @@ $(".test").parentUntil()
 
 ```javascript
 ready(fn) // 当DOM载入就绪可以查询及操纵时绑定一个要执行的函数。
-$(document).ready(function(){}) -----------> $(function(){})　　
+$(document).ready(function(){}) -----------> $(function(){})　
+还有一种简写方式就是
+$(function(){
+  ……………………
+})
 ```
 
 **事件绑定**
@@ -164,12 +168,47 @@ $(document).ready(function(){}) -----------> $(function(){})　　
 ```javascript
 //语法:  标签对象.事件(函数)    
 eg: $("p").click(function(){})
+
+Tip：有一个事件绑定顺序的问题，后天生成的标签不会被应用上之前的事件绑定。这里就要用到事件委派了。
+比如我点击一个button按钮的时候会给ul下添加li标签：
+$("button").click(function(){
+  $("ul").append("<li>asdasd</li>")
+})
+我想要点击li的时候弹出alert
+$("li").click(function(){
+  alert(123)
+})
+
+html:
+<ul>
+  <li>123</li>
+  <li>123</li>
+  <li>123</li>
+  <li>123</li>
+</ul>
+
+在一开始的时候就有4个li，这4个li会被我们写的click时间所绑定，但是如果按button按钮后，新添加的li并不会收到click事件绑定的影响，这个就是我们所说的问题。
 ```
 
 **事件委派**
 
 ```javascript
-$("").on(eve,[selector],[data],fn)  // 在选择元素上绑定一个或多个事件的事件处理函数。
+# 现在在3.x里只剩下一个方法用这个on可以搞定
+$("").on(event,[selector],[data],fn)  // 在选择元素上绑定一个或多个事件的事件处理函数。
+
+# 示例，现在不给li绑定事件了，我们给ul绑定时间，然后委派给ul下的li。
+# 这个li不管是你先有的，还是后有的都是ul下的，因此都会触发on的click事件。
+# 在jq2.x中是delegate
+# 如果没有事件委派的话也可以用on，只不过selector这个可选参数这里不写就行了。
+$("ul").on("click",'li',function(){
+  console.log(123)
+})
+
+# 在jq2.x中有一个老的写法，由于部分jq代码还是2的版本因此也要知道这个内容
+$(".p").bind(function(){xxxxx})
+
+# 与事件委派相反的解除时间就是是用off。off不加参数表示取消所有事件，加的话表示取消具体事件，比如click
+$("p").off()
 ```
 
 示例
@@ -649,7 +688,23 @@ $('.p1').offset({left:300,top:200})
 
 # 相当于已定位的父级的位置
 $("").position()
+
+# 返回顶部，不加val就是取当前的位置，如果填值的话那就是相当于一个赋值的操作。
 $("").scrollTop([val])
+# 示例，这个是对当前的window窗口生效。
+$(".top").click(function(){
+  $(window).scrollTop(0);
+})
+
+# 控制没拉到最下面的时候先不显示这个回到顶部的按钮
+window.onscroll=function(){
+  if($(window)).scrolltop()>200){
+    $(".top").show();
+  }else{
+    $(".top").hide();
+  }
+}
+
 $("").scrollLeft([val])
 ```
 
@@ -835,10 +890,15 @@ Example3:
 **尺寸操作**
 
 ```javascript
+# 内容区域的高度
 $("").height([val|fn])
+# 我们一直说的width其实是content内容部分的宽度，这就是为什么设置了padding之后容器被撑开了。
 $("").width([val|fn])
+# 这个innerheight拿的就是padding+内容的大小。
 $("").innerHeight()
 $("").innerWidth()
+# centent+padding+border，默认这个里面还有一个参数，默认为false，如果改为true的话会默认计算margin的值
+# 比如$("").outerHeight(true)，记住这里的参数默认是false，也就是不会计算margin的值。
 $("").outerHeight([soptions])
 $("").outerWidth([options])
 ```
