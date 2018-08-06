@@ -218,7 +218,7 @@ class xxxForm(Form):
 # 得到的值是形如："['1','2']"这样列表形式的字符串，是str格式的，['1','2']是selectMultiple得到的，转换成字符串是CharField给我们多此一举。这种情况下针对单选的时候用CharField其实是没什么问题的，但是针对多选的话就有问题了。因此就不能使用CharField了。
 # 因此使用多选的时候要使用MultipleChoiceFiled+choices结合使用。
 xx = fields.MultipleChoiceField(
-	choice=models.Classes.objects.values_list('id','title'),
+	choices=models.Classes.objects.values_list('id','title'),
     widget=widgets.SelectMultiple
 )
 ```
