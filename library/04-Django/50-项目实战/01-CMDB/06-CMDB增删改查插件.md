@@ -228,15 +228,17 @@ function initTableBody(server_list,table_config) {
     * 是一条资产信息。我们遍历具体的每一条资产拿数据。
     * row是整个一条资产的信息，rrow是table_config表头的详细信息字典
     */
-    var tr = document.createElement('tr');
     $.each(server_list,function (k,row) {
         // 遍历server_list列表，k为索引值，row为包含资产信息的小字典，形如：
         // row:{"id": 1, "hostname": "\u9a6c\u6653\u96e8\u7684MBP"},
+        var tr = document.createElement('tr');
         $.each(table_config,function (kk,rrow) {
             // 这里把table_config引进来是为了解决字段乱序的问题
             // 这样以后如果想要调整顺序的话就可以随便更换了，直接换后台配置文件就行了。
             // kk还是索引值，rrow: {'q':'id','title':'ID'}样式的字典
             var td = document.createElement('td');
+            // 如果rrow.q是有值的那么rrow.q就是我们要的字段名称，将这个作为key的话填入到row中
+            // 就可以根据这个key值拿到对应的value填入到td中就可以了。
             // if(rrow['q']){
             //     td.innerHTML = row[rrow.q];
             // }else{
@@ -244,24 +246,32 @@ function initTableBody(server_list,table_config) {
             //     td.innerHTML = rrow.text;
             // }
 
-            // rrow['q']
-            // rrow['text']
-            // rrow.text.tpl = "asdasd{n1}asd"
-            // rrow.text.kwargs = {'n1':'@id', 'n2':'as'}
+			/*
+			* 这里对上述的插入数据的方法做了一点扩展，在后台传过来的table_config中海油text这个key
+			* text.tpl对应的是模板，而text.kwargs对应的则是参数，可以参考下面的示例：
+			* rrow.text.tpl = "asdasd{n1}asd"
+			* rrow.text.kwargs = {'n1':'@id', 'n2':'as'}
+			* 我想要一种效果就是虽然后台拿过来的值是固定的，但是我在前台展示的时候可以加点料。
+			* 这个模板由我自己来定义，但是显示以及模板内容替换由前端来做。
+			*/
+            // 首先定义一个空的字典
             var newKwargs = {};
+            // 遍历传递过来的参数,这里我们自定义了一种模式，模板以”@+字段名“形式的组合的会被动态的
+            // 替换成字段名的数据，当时并不是所有的数据都需要被替换成动态数据，因此要原原本本显示的
+            // 的数据就不加@符号了，我把@符号作为是否替换动态数据的依据
             $.each(rrow.text.kwargs, function (tpkey,tpvalue) {
                 var av = tpvalue;
-                if(tpvalue[0] == "@"){
-                    // 模板是以@开头的，比如@username,@id这类的。
-                    // 当然这个模板的使用并不是必须的，如果不用的话就不用按照上面形式书写
-                    // 所以这个时候要做一个判断，如果是以@开头的那么就
-                    // 那么首先判断是否是以@开头，如果是的话取后面的值，
+                if(tpvalue[0] === "@"){
+                    // 模板是以@开头的，比如@username,@id这类的。判断方法也很简单直接用字符串切割。
+                    // 如果是以@开头的那么就那么就把后面的字段名拿出来，否则av就等于原原本本的值就可以
+                    // 通过substring取到@后面的字段值，然后作为key值在row中取到真实的数据。
                     av = row[tpvalue.substring(1,tpvalue.length)];
-                    console.log(av);
                 }
+                // 更新字典，比如newKwargs['n1'] = 22;这样的
                 newKwargs[kkk] = av;
             });
-            // var newText = rrow.text.tpl.format(rrow.text.kwargs);
+            // 我们在上面扩展了js的string对象，让它可以像python字符串那样进行format格式化。
+            // 替换完了以后tpl中的什么n1,n2什么的都被替换成了最终可以直接显示的值了。
             var newText = rrow.text.tpl.format(newKwargs);
             td.innerHTML = newText;
             $(tr).append(td)
@@ -271,4 +281,37 @@ function initTableBody(server_list,table_config) {
 }
 ```
 
-上面这个是动态定制列，对于列上面的内容可以通过格式化进行自定制。现在有一个需求是会去数据库去取，但是不想让这个字段在页面显示出来。因此需要对这个table_config进行扩展，添加一个display字段标明是否显示。比如修改了业务线以后应该发到后台的是id。
+上面这个是动态定制列，对于列上面的内容可以通过格式化进行自定制。现在有一个需求是会去数据库去取，但是不想让这个字段在页面显示出来。因此需要对这个table_config进行扩展，添加一个display字段标明是否显示。比如修改了业务线以后应该发到后台的是业务线的id，但是这个id根本不需要在前台去显示，因此我们可以增加一个display字段去控制。加完以后table_config中的每一个小字典应该是这种形式的：
+
+```python
+{
+    'q': 'id',
+    'title': 'ID',
+    'display': False,
+    'text': {
+        'tpl': '{n1}',
+        'kwargs': {'n1': '@id'},
+    }
+},
+```
+
+然后在对应的Inittableheader和inittablebody中添加上if判断就可以了。请参考完整版代码
+
+
+
+封装
+
+
+
+jquery的扩展
+
+```javascript
+jq.extend({
+    xx:function(arg){
+        
+    }
+})
+
+$.xx(123)
+```
+
