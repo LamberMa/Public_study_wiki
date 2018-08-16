@@ -374,15 +374,29 @@ function initTableBody(server_list,table_config) {
 
 ### 封装
 
-最后我们想把这个小的插件封装成一个js组件方便以后项目的调用，因此采用jquery的插件扩展功能。这个项目中存在变数的有url，这是访问
+最后我们想把这个小的插件封装成一个js组件方便以后项目的调用，因此采用jquery的插件扩展功能。这个项目中存在变数的有url，这是访问后端api数据的，这个内容是变化的。
 
 ```javascript
-jq.extend({
-    xx:function(arg){
-        
-    }
-})
-
-$.xx(123)
+// 声明一个匿名函数，给这个匿名函数传递一个jQuery的参数。匿名函数会自执行。
+(function(jq){
+    function initial(url){……}
+    function initTableHeader(table_config){……}
+    function initTableBody(server_list, table_config){……}
+    
+    // 对jquery进行扩展
+    jq.extend({
+        curd: function(url){
+            initial(url);
+        }
+    })
+})(jQuery)
 ```
 
+那么前端想使用这个插件的时候，直接引入这个插件然后：
+
+```javascript
+# 直接这样调用，然后传入api的地址就行了，这样这个插件就有一定的通用性了
+$.curd('/backend/curd_json.html')
+```
+
+为什么要把这些功能封到一个匿名函数中呢，因为这个匿名函数的作用域包含上述的函数在外部都是不可调用的，唯一的入口也就是我们自己定义的这个扩展的jq的curd这个方法可以用到。

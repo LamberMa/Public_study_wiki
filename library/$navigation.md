@@ -94,6 +94,7 @@
     - **Cobbler**
     - **Saltstack**
     - **Ansible**
+        - [Ansible](?file=01-Linux运维/08-运维自动化/03-Ansible/01-Ansible "Ansible")
     - **Jenkins**
         - [Jenkins部署与简单应用](?file=01-Linux运维/08-运维自动化/04-Jenkins/01-Jenkins部署与简单应用 "Jenkins部署与简单应用")
         - [Jenkins回滚](?file=01-Linux运维/08-运维自动化/04-Jenkins/04-Jenkins回滚 "Jenkins回滚")
@@ -121,22 +122,24 @@
         - [defaultdict](?file=02-Python基础/00-Python常用模块详解/16-16、collections模块/01-defaultdict "defaultdict")
 - **Python基础**
     - [Python基础](?file=02-Python基础/01-Python基础/00-Python基础 "Python基础")
-    - [变量](?file=02-Python基础/01-Python基础/01-变量 "变量")
-    - **2、Python函数部分**
-        - [Python的函数](?file=02-Python基础/01-Python基础/02-2、Python函数部分/01-Python的函数 "Python的函数")
-        - [函数的参数](?file=02-Python基础/01-Python基础/02-2、Python函数部分/02-函数的参数 "函数的参数")
-        - [命名空间和作用域](?file=02-Python基础/01-Python基础/02-2、Python函数部分/03-命名空间和作用域 "命名空间和作用域")
-        - [函数的嵌套](?file=02-Python基础/01-Python基础/02-2、Python函数部分/04-函数的嵌套 "函数的嵌套")
-        - [装饰器](?file=02-Python基础/01-Python基础/02-2、Python函数部分/05-装饰器 "装饰器")
-        - [列表&元组](?file=02-Python基础/01-Python基础/02-2、Python函数部分/06-列表&元组 "列表&元组")
-        - [迭代器与生成器](?file=02-Python基础/01-Python基础/02-2、Python函数部分/07-迭代器与生成器 "迭代器与生成器")
-        - [列表解析与生成器表达式](?file=02-Python基础/01-Python基础/02-2、Python函数部分/08-列表解析与生成器表达式 "列表解析与生成器表达式")
-        - [协程函数](?file=02-Python基础/01-Python基础/02-2、Python函数部分/09-协程函数 "协程函数")
-        - [内置函数](?file=02-Python基础/01-Python基础/02-2、Python函数部分/10-内置函数 "内置函数")
-        - [递归](?file=02-Python基础/01-Python基础/02-2、Python函数部分/11-递归 "递归")
-        - [函数式编程介绍](?file=02-Python基础/01-Python基础/02-2、Python函数部分/12-函数式编程介绍 "函数式编程介绍")
+    - **Python基础部分**
+        - [集合](?file=02-Python基础/01-Python基础/01-Python基础部分/04-集合 "集合")
+    - **Python函数部分**
+        - [Python的函数](?file=02-Python基础/01-Python基础/02-Python函数部分/01-Python的函数 "Python的函数")
+        - [函数的参数](?file=02-Python基础/01-Python基础/02-Python函数部分/02-函数的参数 "函数的参数")
+        - [命名空间和作用域](?file=02-Python基础/01-Python基础/02-Python函数部分/03-命名空间和作用域 "命名空间和作用域")
+        - [函数的嵌套](?file=02-Python基础/01-Python基础/02-Python函数部分/04-函数的嵌套 "函数的嵌套")
+        - [装饰器](?file=02-Python基础/01-Python基础/02-Python函数部分/05-装饰器 "装饰器")
+        - [列表&元组](?file=02-Python基础/01-Python基础/02-Python函数部分/06-列表&元组 "列表&元组")
+        - [迭代器与生成器](?file=02-Python基础/01-Python基础/02-Python函数部分/07-迭代器与生成器 "迭代器与生成器")
+        - [列表解析与生成器表达式](?file=02-Python基础/01-Python基础/02-Python函数部分/08-列表解析与生成器表达式 "列表解析与生成器表达式")
+        - [协程函数](?file=02-Python基础/01-Python基础/02-Python函数部分/09-协程函数 "协程函数")
+        - [内置函数](?file=02-Python基础/01-Python基础/02-Python函数部分/10-内置函数 "内置函数")
+        - [递归](?file=02-Python基础/01-Python基础/02-Python函数部分/11-递归 "递归")
+        - [函数式编程介绍](?file=02-Python基础/01-Python基础/02-Python函数部分/12-函数式编程介绍 "函数式编程介绍")
     - [元组](?file=02-Python基础/01-Python基础/07-元组 "元组")
-    - [可变不可变类型](?file=02-Python基础/01-Python基础/08-可变不可变类型 "可变不可变类型")
+    - [变量](?file=02-Python基础/01-Python基础/08-变量 "变量")
+    - [可变不可变类型](?file=02-Python基础/01-Python基础/09-可变不可变类型 "可变不可变类型")
     - [Python的编码](?file=02-Python基础/01-Python基础/10-Python的编码 "Python的编码")
     - [字符串的操作](?file=02-Python基础/01-Python基础/11-字符串的操作 "字符串的操作")
     - [文件操作](?file=02-Python基础/01-Python基础/13-文件操作 "文件操作")
@@ -250,20 +253,28 @@
 - [开工第一天](?file=04-Django/100-开工第一天 "开工第一天")
 - [Django-auth模块](?file=04-Django/11-Django-auth模块 "Django-auth模块")
 - [rabbitmq](?file=04-Django/12-rabbitmq "rabbitmq")
+- **Django-rest-framework**
+    - [restframework](?file=04-Django/13-Django-rest-framework/01-restframework "restframework")
+- [Django待整理内容](?file=04-Django/30-Django待整理内容 "Django待整理内容")
 - **项目实战**
-    - **01、CMDB**
-        - [CMDB简介](?file=04-Django/50-项目实战/01-01、CMDB/01-CMDB简介 "CMDB简介")
-        - [高级配置文件设计](?file=04-Django/50-项目实战/01-01、CMDB/02-高级配置文件设计 "高级配置文件设计")
-        - [可插拔式插件的设计](?file=04-Django/50-项目实战/01-01、CMDB/03-可插拔式插件的设计 "可插拔式插件的设计")
-    - **02、CRM**
     - **CMDB**
-        - [CMDB-1](?file=04-Django/50-项目实战/97-CMDB/01-CMDB-1 "CMDB-1")
-        - [CMDB-2](?file=04-Django/50-项目实战/97-CMDB/02-CMDB-2 "CMDB-2")
-    - **Django Blog**
-        - [需求分析&DB设计](?file=04-Django/50-项目实战/98-Django Blog/01-需求分析&DB设计 "需求分析&DB设计")
-        - [首页](?file=04-Django/50-项目实战/98-Django Blog/02-首页 "首页")
-        - [文件的上传](?file=04-Django/50-项目实战/98-Django Blog/08-文件的上传 "文件的上传")
-        - [上传头像](?file=04-Django/50-项目实战/98-Django Blog/10-上传头像 "上传头像")
+        - [CMDB简介](?file=04-Django/50-项目实战/01-CMDB/01-CMDB简介 "CMDB简介")
+        - [中控客户端设计](?file=04-Django/50-项目实战/01-CMDB/02-中控客户端设计 "中控客户端设计")
+        - [CMDB服务端设计](?file=04-Django/50-项目实战/01-CMDB/03-CMDB服务端设计 "CMDB服务端设计")
+        - [资产入库](?file=04-Django/50-项目实战/01-CMDB/04-资产入库 "资产入库")
+        - [API验证&AES加密](?file=04-Django/50-项目实战/01-CMDB/05-API验证&AES加密 "API验证&AES加密")
+        - [CURD1](?file=04-Django/50-项目实战/01-CMDB/06-CURD1 "CURD1")
+        - [CURD2](?file=04-Django/50-项目实战/01-CMDB/07-CURD2 "CURD2")
+        - [CMDB-1](?file=04-Django/50-项目实战/01-CMDB/99-CMDB-1 "CMDB-1")
+    - **CRM**
+    - **堡垒机**
+        - [堡垒机](?file=04-Django/50-项目实战/03-堡垒机/01-堡垒机 "堡垒机")
+    - **Blog**
+        - [需求分析&DB设计](?file=04-Django/50-项目实战/04-Blog/01-需求分析&DB设计 "需求分析&DB设计")
+        - [首页](?file=04-Django/50-项目实战/04-Blog/02-首页 "首页")
+        - [文件的上传](?file=04-Django/50-项目实战/04-Blog/08-文件的上传 "文件的上传")
+        - [上传头像](?file=04-Django/50-项目实战/04-Blog/10-上传头像 "上传头像")
+        - [在线编辑器使用](?file=04-Django/50-项目实战/04-Blog/22-在线编辑器使用 "在线编辑器使用")
 - [Django常见小问题](?file=04-Django/99-Django常见小问题 "Django常见小问题")
 
 ##### Frontend
@@ -277,7 +288,7 @@
     - [CSS简单了解](?file=05-Frontend/02-CSS/01-CSS简单了解 "CSS简单了解")
     - [CSS盒模型](?file=05-Frontend/02-CSS/02-CSS盒模型 "CSS盒模型")
     - [浮动](?file=05-Frontend/02-CSS/03-浮动 "浮动")
-    - [vertical-align](?file=05-Frontend/02-CSS/06-vertical-align "vertical-align")
+    - [vertical&line-hight](?file=05-Frontend/02-CSS/06-vertical&line-hight "vertical&line-hight")
     - [CSS3](?file=05-Frontend/02-CSS/20-CSS3 "CSS3")
     - [常见样式布局](?file=05-Frontend/02-CSS/98-常见样式布局 "常见样式布局")
     - **CSS框架**
@@ -298,8 +309,8 @@
         - [Select移动](?file=05-Frontend/03-JavaScript/08-JS实例练习/05-Select移动 "Select移动")
         - [二级联动](?file=05-Frontend/03-JavaScript/08-JS实例练习/06-二级联动 "二级联动")
         - [跑马灯&tab切换](?file=05-Frontend/03-JavaScript/08-JS实例练习/07-跑马灯&tab切换 "跑马灯&tab切换")
+        - [轮播图练习](?file=05-Frontend/03-JavaScript/08-JS实例练习/08-轮播图练习 "轮播图练习")
     - [其他](?file=05-Frontend/03-JavaScript/10-其他 "其他")
-    - [asxasx](?file=05-Frontend/03-JavaScript/11-asxasx "asxasx")
 - **Ajax**
     - [Ajax入门](?file=05-Frontend/05-Ajax/01-Ajax入门 "Ajax入门")
     - [伪造ajax](?file=05-Frontend/05-Ajax/02-伪造ajax "伪造ajax")
