@@ -39,9 +39,7 @@ urlpatterns = [
 <body>
     <div style="width: 700px;margin: 0 auto;">
         <table class="table table-bordered table-hover">
-            <thead id="tbhead">
-                <tr></tr>
-            </thead>
+            <thead id="tbhead"></thead>
             <tbody id="tbbody"></tbody>
 
     </table>
@@ -87,7 +85,7 @@ def curd(request):
 },]
 ```
 
-- q：即query，要查询的字段，比如主机名的q就是hostname，id的q就是id；因为我们这里完全是借助的django_orm去操作的。因此这里也可以使用跨表，反向查询的。
+- q：即query，要查询的字段，比如主机名的q就是hostname，id的q就是id；因为我们这里完全是借助的django_orm去操作的。因此这里也可以使用跨表，反向查询的。当然这里的值也可以是None，None指的是这个字段不需要去数据库查询的时候设置的值；因为有的时候我们可能要在标题显示一列操作，这一列操作和数据本身没有什么关系，也不用去数据库拿值。
 
 - title：要显示在标题的名称。
 
@@ -96,23 +94,54 @@ def curd(request):
 - text：模板，根据模板我们可以定制最终在表格中展示的数据的最终形式。有的时候我们并不想让数据原原本本的就显示从数据库取出来的样子，我们有时候会给数据加上一个后缀或者前缀然后再在前端页面显示，这里就用到了模板，这个操作加强了我们的数据展示的可定制性。
 
   ```python
-  # text本身就是一个小字典，其内部包含tpl以及kwargs两个key，其中tpl表示要展示在前端表格的模板，kwargs表示要填充进模板的参数。
+  # text本身就是一个小字典，其内部包含tpl以及kwargs两个key，其中tpl表示要展示在前端表格的模板，kwargs表示要填充进模板的参数。比如下面这个示例实际的tpl展示的就是一个a标签，然后nid会被对应的id替换到这个a标签中。这样就可以保证每个a标签中的nid都是跟随数据库中的id一致。
+  # 这里@id其实就是要替换的值为id字段的值，具体的处理我们会放到前端去做内容的匹配，你只要知道这里的@后面的其实和query的内容是一个意思就可以了。
+  'text': {
+      'tpl': '<a href="/backend/del?nid={nid}">删除</a>',
+      'kwargs': {'nid': '@id'},
+  },
+      
+  # 
   ```
 
-  
+简单的table_config说明完毕，当然这只是展示的一个页面或者仅仅是一个服务，比如在CMDB中，我要展示资产表，我有这样的一个table_config，当展示服务器表或者其他表的时候对应的字段根据models设计的不一样也是会发生变化的，因此针对不同的服务需要设置不同的table_config。
 
-1. 做一个类似于python中的字符串格式化的模板，tpl，将kwargs中的参数传递进去以后就可以将格式化的字符串显示出来。这样可以做到让普通字符串直接显示，有模板的替换模板成动态值。
+### 取值&传值
 
-2. 这个我们想在表格的最后一列添加一列操作，比如操作这一列的表格内有编辑啊，删除啊操作，这在前端体现应该是一个a标签，但是它不需要在数据库字段内去取值的，因此我们在table_config中添加一个小字典，让q为None，也就是意味着不取。对应的text中的tpl模板也要进行修改
+现在我们设计好了要拿的字段，接下来就是需要在数据库去取了。
 
-3. 上面这样一个数据结构构造完成以后把我们要在数据库取的字段名拿出来，同时过滤掉q值为None的操作列，因为values_list列表里不允许存在None值。这样生成的values_list就是一个要取的字段列表
-   values_list = [row['q'] for row in table_config if row['q']]
+```python
+# 取的话还是很简单的，直接去遍历table_config然后过滤掉q为None的情况，因为查询的字段不允许出现None值。使用列表生成式构造一个values_list。
+values_list = [row['q'] for row in table_config if row['q']]
+```
 
-4. 拿到要取的字段列表以后我们就可以直接使用这个列表取数据了`models.Server.objects.values(*values_list)`。拿到数据以后我们就要序列化一下返回给前端了。不过这样取出来的是一个queryset。queryset对象是一个不可json序列化的对象，否则会报错`Object of type 'QuerySet' is not JSON serializable`，解决这个问题的方法很简单，在序列化之前list一下就可以了。强制做类型转换。
+取数据的话那么就简单多了：
 
-5. 还有一个可能造成上述问题的可能就是你取出来的值里包含datetime的对象的话也是会报上面的错误的。这个时候我们要对默认的json进行二次的定制（扩展）：
+```python
+# 取的时候支持*args列表，或者**kwargs字典，我们就可以把取号的values_list都扔在这里。
+# 最后拿到的这个资源列表就是我们最终想要的这么一个资源的query_set。
+resource_list = models.Server.objects.values(*values_list)
+```
+
+因为具体数据的生成是靠前端JS去动态的生成，因此我们将取出的数据值直接序列化一下丢给前端就可以了。这里提供了两种方法，其中一种借用django，另外一种自定制：
+
+1. 使用Django的序列化模块
 
    ```python
+   # 可以使用序列化模块进行序列化，
+   v = models.Server.objects.all()
+   from django.core import serializers
+   # serializers可以针对queryset对象进行序列化。
+   data = serializers.serialize('json', v)
+   ```
+
+2. 自己序列化
+
+   ```python
+   # 自己序列化想到的无非就是json.dumps一下，然后return给前端，不过json.dumps的时候需要注意几个问题，首先queryset对象是不可以序列化的，因为我们在上面的取出来的内容就是一个queryset，所以在返回给前端的时候要list一下，强制做一下类型的转换。或者你取的时候你就别取queryset就得了。直接拿列表
+   # 还有一个问题就是如果你取出来的值包含datetime对象的话同样也会造成序列化失败，同queryset，报错内容为：Object of type 'xxx' is not JSON serializable。因此需要我们自己对默认的JSON做一个二次扩展，代码内容如下：
+   
+   from datetime import date, datetime
    class JsonCustomEncoder(json.JSONEncoder):
    
        def default(self, value):
@@ -130,19 +159,16 @@ def curd(request):
    json.dumps(ret, cls=JsonCustomEncoder)
    ```
 
-   上述的方法可以是一个比较通用的方法，因为我们经常会用values去取值，还有一种方法是django为我们提供的，同样可以达到上述的效果：
+然后我们把数据返回给前端，前端就可以拿到数据了。
 
-   ```python
-   # 可以使用序列化模块进行序列化，当然直接去数据直接取出来字典或者列表，不弄出来queryset就行了。
-   v = models.Server.objects.all()
-   from django.core import serializers
-   serializers可以针对queryset对象进行序列化。
-   data = serializers.serialize('json', v)
-   ```
+```python
+ret = {
+    'server_list': list(server_list),
+    'table_config': table_config,
+}
+```
 
-6. 最后返回给前端序列化后的数据，一个server_list（列表），table_config，也是一个列表，里面包着一个一个小的字典。
-
-完整视图函数
+完整视图函数参考：
 
 ```python
 def curd_json(request):
@@ -216,9 +242,11 @@ def curd_json(request):
     return HttpResponse(json.dumps(ret, cls=JsonCustomEncoder))
 ```
 
-**前端接收处理**
+## JS端的简单处理
 
 现在已经可以通过访问后端拿到传递过来的数据了，那么应该如何处理呢？表头和表数据分别填充；
+
+### 拿数据
 
 ```javascript
 $(function () {
@@ -226,6 +254,47 @@ $(function () {
     initial();
 });
 
+// 后端发送获取数据的js
+function initial() {
+    $.ajax({
+        url:'/backend/curd_json.html',
+        type:'GET',
+        dataType: 'JSON',
+        success:function (arg) {
+            // 这里分别定义了两个初始化函数一个创建表头，一个填充数据内容。
+            // 创建表头，将我们的定制的配置文件table_config传递过去。
+            initTableHeader(arg.table_config);
+            // 为数据表填充数据，将资产和table_config传递过去，根据table_config填充数据
+            initTableBody(arg.server_list,arg.table_config);
+        }
+    })
+}
+```
+
+### 填充表头数据
+
+```javascript
+function initTableHeader(table_config) {
+    /*
+    * 我现在要通过这个table_config动态的，因为table_config要显示啥使我们在后端定义好的
+    * 插入表格的表头，也就是th标签；遍历table_config，k为索引值，v为含有标题的小字典
+    */
+    // 生成tbhead中的一行，一个tr标签。
+    var $tr = $('<tr>');
+    $.each(table_config,function (k,v) {
+        var tag = document.createElement('th');
+        tag.innerHTML = v.title;
+        $('#tbhead').find('tr').append(tag);
+    })
+    $('#tbhead').append($tr);
+}
+```
+
+![](http://tuku.dcgamer.top/18-8-16/75017048.jpg)
+
+### 填充表格内容
+
+```javascript
 // 为字符串创建可以像Python那样的字符串的格式化方法
 String.prototype.format = function (args) {
     return this.replace(/\{(\w+)\}/g, function (s,i) {
@@ -233,115 +302,79 @@ String.prototype.format = function (args) {
     });
 };
 
-// 这就是之前说的向后端发送获取数据的js
-function initial() {
-    $.ajax({
-        url:'/backend/curd_json.html',
-        type:'GET',
-        dataType: 'JSON',
-        success:function (arg) {
-            // 创建表头
-            initTableHeader(arg.table_config);
-            // 为数据表填充数据
-            initTableBody(arg.server_list,arg.table_config);
-        }
-    })
-}
-
-function initTableHeader(table_config) {
-    /*
-    * 我现在要通过这个table_config动态的，因为table_config要显示啥使我们在后端定义好的
-    * 插入表格的表头，也就是th标签；遍历table_config，k为索引值，v为含有标题的小字典
-    */
-    $.each(table_config,function (k,v) {
-        var tag = document.createElement('th');
-        tag.innerHTML = v.title;
-        $('#tbhead').find('tr').append(tag);
-    })
-}
-
 function initTableBody(server_list,table_config) {
     /*
     * server_list从后台发回来的数据是一个列表套字典的形式，每一个小字典都
     * 是一条资产信息。我们遍历具体的每一条资产拿数据。
-    * row是整个一条资产的信息，rrow是table_config表头的详细信息字典
     */
     $.each(server_list,function (k,row) {
-        // 遍历server_list列表，k为索引值，row为包含资产信息的小字典，形如：
-        // row:{"id": 1, "hostname": "\u9a6c\u6653\u96e8\u7684MBP"},
+        // 遍历server_list列表，k为索引值，row是一条资产信息，形如：
+        // row:{"id": 1, "hostname": "lamber的MacBookPro"},
+        // 每循环一条资产数据加一行，生成一个tr
         var tr = document.createElement('tr');
-        $.each(table_config,function (kk,rrow) {
-            // 这里把table_config引进来是为了解决字段乱序的问题
-            // 这样以后如果想要调整顺序的话就可以随便更换了，直接换后台配置文件就行了。
-            // kk还是索引值，rrow: {'q':'id','title':'ID'}样式的字典
-            var td = document.createElement('td');
-            // 如果rrow.q是有值的那么rrow.q就是我们要的字段名称，将这个作为key的话填入到row中
-            // 就可以根据这个key值拿到对应的value填入到td中就可以了。
-            // if(rrow['q']){
-            //     td.innerHTML = row[rrow.q];
-            // }else{
-            //     console.log(rrow.text);
-            //     td.innerHTML = rrow.text;
-            // }
-
-			/*
-			* 这里对上述的插入数据的方法做了一点扩展，在后台传过来的table_config中海油text这个key
-			* text.tpl对应的是模板，而text.kwargs对应的则是参数，可以参考下面的示例：
-			* rrow.text.tpl = "asdasd{n1}asd"
-			* rrow.text.kwargs = {'n1':'@id', 'n2':'as'}
-			* 我想要一种效果就是虽然后台拿过来的值是固定的，但是我在前台展示的时候可以加点料。
-			* 这个模板由我自己来定义，但是显示以及模板内容替换由前端来做。
-			*/
-            // 首先定义一个空的字典
-            var newKwargs = {};
-            // 遍历传递过来的参数,这里我们自定义了一种模式，模板以”@+字段名“形式的组合的会被动态的
-            // 替换成字段名的数据，当时并不是所有的数据都需要被替换成动态数据，因此要原原本本显示的
-            // 的数据就不加@符号了，我把@符号作为是否替换动态数据的依据
-            $.each(rrow.text.kwargs, function (tpkey,tpvalue) {
-                var av = tpvalue;
-                if(tpvalue[0] === "@"){
+        $.each(table_config,function (key, tbconfig_value) {
+            // 这里把table_config引进来是为了解决字段乱序的问题，按照table_config的设置
+            // 在我们传过来的server资产中去拿数据，这样显示的数据就不会是乱序的，而且显示
+            // 的顺序我们也是可以自己定义的，只要改后端table_config的对应项的位置就可以了。
+            // tableconfig_value: {'q':'id','title':'ID'}样式的字典
+            // 如果让显示再显示，不让显示的就不显示。判断display属性。
+            if (tableconfig_value.display){
+                // 创建一个td
+                var td = document.createElement('td');
+                /**
+                 * 如果rrow.q是有值的那么rrow.q就是我们要的字段名称，将这个作为key的话填入到
+                 * row中，就可以根据这个key值拿到对应的value填入到td中就可以了。
+                 * if(tabconfig_value['q']){
+                 *     td.innerHTML = row[rrow.q];
+                 * }else{
+                 *     console.log(rrow.text);
+                 *     td.innerHTML = rrow.text;   
+                 * }
+                 */
+                /* 这里并不采用上述的方法，为了保证我们之前说过的可以自定制内容的显示因此要把text中的
+                * kwargs参数项目利用起来。这里对上述的插入数据的方法做了一点扩展；
+                * text.tpl对应的是模板，而text.kwargs对应的则是参数，可以参考下面的示例：
+                * rrow.text.tpl = "asdasd{n1}asd"
+                * rrow.text.kwargs = {'n1':'@id', 'n2':'as'}
+                */
+                // 首先定义一个空的字典
+                var newKwargs = {};
+                // 遍历传递过来的参数,这里我们自定义了一种模式，模板以”@+字段名“形式的组合的会被动态的
+                // 替换成字段名的数据，当然并不是所有的数据都需要被替换成动态数据，因此要原原本本显示的
+                // 的数据就不加@符号了，我把@符号作为是否替换动态数据的依据，这个是我们自定义的。
+                $.each(tableconfig_value.text.kwargs, function (tpkey,tpvalue) {
+                	var item = tpvalue;
+                    if(tpvalue[0] === "@"){
                     // 模板是以@开头的，比如@username,@id这类的。判断方法也很简单直接用字符串切割。
-                    // 如果是以@开头的那么就那么就把后面的字段名拿出来，否则av就等于原原本本的值就可以
+                    // 如果是以@开头的那么就那么就把后面的字段名拿出来，否则item就等于原原本本的值就行
                     // 通过substring取到@后面的字段值，然后作为key值在row中取到真实的数据。
-                    av = row[tpvalue.substring(1,tpvalue.length)];
-                }
-                // 更新字典，比如newKwargs['n1'] = 22;这样的
-                newKwargs[kkk] = av;
-            });
-            // 我们在上面扩展了js的string对象，让它可以像python字符串那样进行format格式化。
-            // 替换完了以后tpl中的什么n1,n2什么的都被替换成了最终可以直接显示的值了。
-            var newText = rrow.text.tpl.format(newKwargs);
-            td.innerHTML = newText;
-            $(tr).append(td)
-        })
+                        item = row[tpvalue.substring(1,tpvalue.length)];
+                    }
+                    // 更新字典，比如newKwargs['n1'] = 22;这样的
+                    newKwargs[tpkey] = item;
+            	});
+                // 然后我们想让JavaScript像python字符串那样格式化，因此需要扩展js的string对象
+                // 具体可以查看最上方的扩展方法，替换完了以后tpl中的变量都被替换成了最终数据值
+                var newText = rrow.text.tpl.format(newKwargs);
+                // newText就是我们的最终的替换完变量要显示的文字，动态的为这个td设置上
+            	td.innerHTML = newText;
+                // 为tr添加一列
+            	$(tr).append(td)
+    		}
+        });
+        // 循环完成以后把整条资产加到表格中，
+   	    $('#tbbody').append(tr);
     });
-    $('#tbbody').append(tr);
 }
 ```
 
-上面这个是动态定制列，对于列上面的内容可以通过格式化进行自定制。现在有一个需求是会去数据库去取，但是不想让这个字段在页面显示出来。因此需要对这个table_config进行扩展，添加一个display字段标明是否显示。比如修改了业务线以后应该发到后台的是业务线的id，但是这个id根本不需要在前台去显示，因此我们可以增加一个display字段去控制。加完以后table_config中的每一个小字典应该是这种形式的：
+现在其实就可以简单的显示出来我们的要的内容了。
 
-```python
-{
-    'q': 'id',
-    'title': 'ID',
-    'display': False,
-    'text': {
-        'tpl': '{n1}',
-        'kwargs': {'n1': '@id'},
-    }
-},
-```
+![](http://tuku.dcgamer.top/18-8-16/22947558.jpg)
 
-然后在对应的Inittableheader和inittablebody中添加上if判断就可以了。请参考完整版代码
+### 封装
 
-
-
-封装
-
-
-
-jquery的扩展
+最后我们想把这个小的插件封装成一个js组件方便以后项目的调用，因此采用jquery的插件扩展功能。这个项目中存在变数的有url，这是访问
 
 ```javascript
 jq.extend({

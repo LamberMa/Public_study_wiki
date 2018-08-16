@@ -13,6 +13,22 @@ Jenkins的安装过程也是极其简单的。点进Jenkins[官方](https://jenk
 - 请以规范的方式进行tomcat的部署工作，具体部署内容在这里不再进行赘述。
 - 默认的启动tomcat的用户我们这里选用的是属主属组都是“tomcat”，目录权限也是如此。
 
+### Jenkins Docker部署
+
+```shell
+# 安装
+docker pull jenkinsci/blueocean
+
+# 运行
+docker run \
+  -u root \
+  -d \
+  -p 9090:8080 \
+  -v jenkins-data:/var/jenkins_home \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  jenkinsci/blueocean
+```
+
 ### Jenkins war包部署
 
 这里采用的就是简单的war包部署，放到tomcat对应的webapps目录下即可。本次部署的主机ip为：192.168.33.22，并没有进行域名的映射。因此直接访问`http://192.168.33.22:8080/jenkins`即可访问到jenkins界面了。

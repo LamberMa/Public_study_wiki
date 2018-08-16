@@ -1,5 +1,3 @@
-www.cnblogs.com/yuanchenqi/articles/6870763.html
-
 # Jquery
 
 > http://jquery.cuishifeng.cn/
@@ -928,9 +926,6 @@ $("").outerWidth([options])
 </head>
 <body>
 
-
-
-
 <div class="box1">
     DIVDIDVIDIV
 </div>
@@ -953,12 +948,39 @@ $("").outerWidth([options])
 
 ## Jq的插件
 
+```javascript
+jQuery.extend({
+    // 扩展方法的名字: 方法的内容
+    min: function(a, b){ return a < b ? a : b;},
+    max: function(a, b){ return a > b ? a : b;},
+});
+```
 
+调用：
 
+```javascript
+// 这里的$其实指代的就是jQuery
+$.min(2,3)  // 2
+$.max(4,5)  // 5
+```
 
+扩充jquery对象
 
+```javascript
+$.fn.extend({
+    checkall: function(){
+        // 这个this是当前的选中的标签组
+        this.each(function(){
+            // 当前选中的标签
+            this.checked=true;
+        })
+    }
+})
+```
 
+调用：
 
+```javascript
+$(':checkbox').checkall()
+```
 
-
-jquery支持链式操作。
