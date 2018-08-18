@@ -242,6 +242,8 @@ JS处理：定义一个idList空数组，然后找到tbbody下的选中的标签
 ```javascript
 $('#multiDel').click(function () {
     var idList = [];
+    // 记得现在前端模版上放上{% csrf_token %}
+    var csrftoken = $('input[name=csrfmiddlewaretoken]');
     $('#tbbody').find(':checked').each(function () {
         idList.push($(this).val());
     });
@@ -309,7 +311,8 @@ def showwork_ajax(request):
         'edit-enable': 'true',
         'edit-type': 'select',
         'global-key': 'device_type_choices',
-        'origin': '@device_type_id'
+        'origin': '@device_type_id',
+        'name': 'device_type_id'，
     }
 },
 ```
@@ -319,6 +322,7 @@ def showwork_ajax(request):
 - edit-enable：是否可以编辑，这个要告诉前端，当前字段是否可以编辑
 - edit-type：告诉前端你这个字段应该是一个input框还是一个select选择框
 - origin：标识原始的数据值，@device_type_id会在前端被替换成对应的值。该字段的作用是当字段的值发生变化以后有一个可对比的原值参照，如果值变了才提交，值不变的话那么就不用提交。
+- name：如果以后数据提交了的话对应提交到数据库的哪个字段呢？这里就是一个标识
 
 ##### 前端JS逻辑实现
 
@@ -336,7 +340,8 @@ function initTableBody(server_list, table_config) {
                 /* 在td标签中添加内容 */
                 var newKwargs = {};
                 $.each(tbconfig_value.text.kwargs, function (tpkey, tpvalue) {
-                   // 这里是遍历kwargs，根据模板生成数据值的操作，太多就直接省略了   
+                    // 这里是遍历kwargs，根据模板生成数据值的操作，太多就直接省略了 
+                    // 略略略略略略略略略略略略略略略
                 });
                 var newText = tbconfig_value.text.tpl.format(newKwargs);
                 td.innerHTML = newText;
@@ -448,32 +453,277 @@ function trIntoEdit($tr) {
 }
 ```
 
-此时我们进入编辑模式以后，再随便选中一个项目以后就会发现此时对应的内容都变成可编辑的了。
+**trOutEdit**
 
-
-
-
-
-
-
-
-
-这里删除可以单个删除也可以批量删除，思路为找到勾选的内容，然后把勾选的加到一个数组里，统一传到后台就可以了。那么传递到后台的应该是什么？应该是这条资产的id信息，而不是资产的内容。但是这个id应该从哪里取，如果说能通过选中的标签通过它的value直接拿到这个资产的id的话那就好了。因此在初始化表结构的时候就应该做这个操作，因此对inittablebody加一个设置id的操作：
+对于退出编辑模式，同样需要传递一个参数，这个参数其实就是我们操作的这一行的tr，传递一个当前行的tr对象过来就可以了，同trIntoEdit。
 
 ```javascript
-function initTableBody(server_list, table_config) {
-        // 同tbhead
-        // $(tbbody).empty();
-        $.each(server_list, function (k, row) {
-            var tr = document.createElement('tr');
-            // 在这里添加一条，设置一点id，内容就是nid。
-            tr.setAttribute('nid', row.id);
-            $.each(table_config, function (key, tbconfig_value) {
-				// 略略略略略略略略略略略略
-            });
-            $('#tbbody').append(tr);
-        });
-
-    }
+function trOutEdit($tr) {
+    $tr.children('td[edit-enable="true"]').each(function () {
+        var editType = $(this).attr('edit-type');
+        if (editType === 'select') {
+            // 首先要拿到默认选中的值。
+            /**
+             * DOM对象转换为jq对象，只要用$()把dom对象包装起来就可以得到了。
+             * jq对象转换为dom对象的时候在后面加一个"[0]"就可以了。
+             * 这里将select的jq对象转换为dom对象调用selectedOptions方法。
+             * */
+            // 如果td内容是一个select框的话，那么在退出之前首先要获取用户到底选中了哪一个
+            var option = $(this).find('select')[0].selectedOptions;
+            // 然后将这个选中的值以一个名为new-origin的属性记录在这td上。
+            // 这么做的原因是后面如果做了修改还要提交到后台，new-origin和origin要进行比较
+            // 如果值相等说明根本就没改，那么发送请求的时候这个就可以pass，new-origin也是一个作为
+            // 判断是否修改的一个标准。
+            $(this).attr('new-origin', $(option).val());
+            // 然后把这个td设置为这个option的显示的值。text是option的值，比如“服务器”,val是对应id
+            $(this).html($(option).text());
+        } else {
+            // 如果不是select框直接先拿值，然后把input框干掉把数值塞在这就行了。
+            var input_val = $(this).find('input').val();
+            $(this).html(input_val);
+        }
+    })
+}
 ```
 
+书写完两个函数以后，此时我们进入编辑模式以后，再随便选中一个项目以会发现此时对应的内容并没有变化，这是因为我们在设置编辑按钮的时候只是检测编辑模式下哪些选中了给它变成编辑模式，如果是编辑模式下，我后来又手动选中的内容就不会发生变化，因此我们还需要单独给checkbox绑定事件：
+
+```javascript
+# 注意，这里要用on的方式绑定数据，直接使用click(function(){})的方式是绑定不上的，这种方式要求得先有数据，因此要用事件的委派。这个时候不管你是先生成的还是后生成的都可以绑定的上。
+$('#tbbody').on('click', ':checkbox', function () {
+    /**
+     * $(this)表示当前的checkbox标签
+     * 1.点击首先检测是否进入编辑模式，如果是，就退出，不是就进入
+     */
+    var $tr = $(this).parent().parent();
+    // 否则什么都不做，因为本来就是直接点不进入编辑模式的。
+    if ($('#editmodelornot').hasClass('btn-warning')) {
+        if ($(this).prop('checked')) {
+            // 进入编辑模式
+            trIntoEdit($tr);
+        } else {
+            // 退出编辑模式
+            trOutEdit($tr)
+        }
+    }
+});
+```
+
+这样操作完成以后，我们就可以进行简单的编辑模式的进出编辑模式了。不过对应的上面的很多内容要进行进一步的扩展，比如全选，全选的时候要判断是否是编辑模式，如果是编辑模式的话就该进入编辑模式，如果不是的话就应该什么都不做，同样的反选，取消操作也要做扩展。
+
+#### 扩展全选/反选/取消
+
+##### 扩展全选
+
+扩展内容无非也就是针对编辑模式多了一层判断：
+
+1. 首先全选的时候会遍历每一行，然后针对每一行做内容的判断，首先判断是否进入编辑模式，如果不在编辑模式的话，我们就逐行遍历然后不管你之前勾上没勾上吧，统一再给你勾一遍。
+2. 如果说在编辑模式的话，我们需要判断在全选之前是否有已经勾选过的。如果没有勾选的就给它勾上，同时进入编辑模式，执行trIntoEdit；如果是已经勾选上的tr，那么这一行本身就应该已经处在一个编辑模式了，我们不要再调用一次trIntoEdit方法去执行了。
+3. 为什么在编辑模式全选的时候要单独判断有没有之前就勾选的内容呢？还记得trIntoEdit的逻辑么，假如edit_type为input的时候，在进入编辑模式的时候首先获取到`$(this)`的text值然后新建一个input标签，然后将这个input标签的value值设置为text的内容，注意，此时设置的是value值，但是input的text内容是空的，空的，空的！所以如果又执行一遍的话，你就会发现input框变成空的了，啥都没有了。很蛋疼；此时如果再执行trOutEdit退出编辑模式的时候，value为空，那么最后设置的td就是一个空值。总之，这里注意的地方就是，td有值那是因为td的text有值，input有值那是因为input的value有值，注意这两点别搞混。
+
+```javascript
+$('#checkAll').click(function () {
+    var $tbbody = $('#tbbody');
+    /**
+     * 首先全选的时候应该让这一行进入编辑模式，但是我们发现通过事件触发和我们手动点击不一样
+     * 手动点击会触发编辑模式，但是事件触发checked并不会进入编辑模式，因此我们需要手动调用一下
+     * */
+     if ($('#editmodelornot').hasClass('btn-warning')) {
+         $tbbody.find(':checkbox').each(function () {
+             if (!$(this).prop('checked')) {
+                 $(this).prop('checked', true);
+                 var $tr = $(this).parent().parent();
+                 trIntoEdit($tr)
+             }
+          })
+     } else {
+         $tbbody.find(':checkbox').prop('checked', true);
+     }
+ });
+```
+
+##### 扩展反选
+
+同全选，加一个针对编辑模式的判断。
+
+```javascript
+$('#checkReverse').click(function () {
+    if ($('#editmodelornot').hasClass('btn-warning')) {
+        $('#tbbody').find(':checkbox').each(function () {
+            var $tr = $(this).parent().parent();
+            if ($(this).prop('checked')) {
+                $(this).prop('checked', false);
+                trOutEdit($tr);
+            } else {
+                $(this).prop('checked', true);
+                trIntoEdit($tr);
+            }
+         })
+    } else {
+        $('#tbbody').find(':checkbox').each(function () {
+            if ($(this).prop('checked')) {
+                $(this).prop('checked', false);
+            } else {
+                $(this).prop('checked', true);
+            }
+         })
+    }
+});
+```
+
+##### 扩展取消按钮
+
+```javascript
+$('#checkCancel').click(function () {
+    if ($('#editmodelornot').hasClass('btn-warning')) {
+        $('#tbbody').find(':checkbox').each(function () {
+            if ($(this).prop('checked')) {
+                $(this).prop('checked', false);
+                var $tr = $(this).parent().parent();
+                trOutEdit($tr)
+            }
+        })
+     } else {
+        $('#tbbody').find(':checkbox').prop('checked', false);
+     }
+});
+```
+
+### 刷新
+
+设置一个刷新按钮，目的就是为了刷新一遍重新拿数据。刷新的时候重新执行以下initial()初始化函数就行了。
+
+```javascript
+$('#refresh').click(function () {
+    // 刷新一遍重新拿数据
+    initial(url);
+});
+```
+
+注意此时执行的时候要扩展以下inittablebody和inittablehead，在创建之前先清除一下，否则你就会看到刷新一次重复的数据在页面重新生成一次：
+
+```javascript
+// 在initTableHeader函数的第一行加上这么一句，先清空再重新生成
+$(tbhead).empty();
+
+// 和initTableHeader函数的第一行加上这么一句，先清空再重新生成。
+$(tbbody).empty();
+```
+
+### 保存
+
+设计编辑模式的原因其实就是为了方便我们进行修改，修改完了以后我们是要提交给后端服务的，因此这里又设置了一个保存按钮，方便用户进行数据的保存：
+
+1. 保存按钮设计为需要退出编辑模式以后才能进行保存，当我们退出编辑模式，执行trOutEdit的时候是会将修改的值获取到然后放到td中的。同时为当前的td设置一个new-origin的属性用来表示数据是否已经发生更改，作为判断标准或者依据。
+2. 定义一个all_list用以保存我们发生修改的数据。
+3. 然后开始遍历tablebody的每一行，之前为每一个tr设置了nid，这个nid其实就是资产信息在数据库的id，在这里就可以很方便的使用上了，定义一个row_dict用来保存到底这一行的哪些数据发生了变化；
+4. 遍历这一行tr的每一个td标签，首先判断这一个td是否是能编辑的，如果不能编辑那就不用进内部的判断了；如果这个数据是可编辑的并且edit-type是select的，那么就要比较new-origin和origin的值，如果变化了，说明修改了，如果没变化说明没有修改；如果修改了的话，那么我们就将这个td字段的name属性作为key，新数据newData作为value更新到这个字典里。当字段不是select的时候，直接获取text值，然后和td的origin属性值进行比较，如果变化了，做如上的同样操作。
+5. 我们在遍历每一行的时候，首先设置一个flag置位，只要数据发生变化了需要修改了那么就把flag置位为true，当遍历完tr的每一个td的时候如果发生了变化，那么还要把这一条tr的资产信息的id带过去。
+6. 将发生变化的这个row_dict字典添加到all_list中
+7. ajax提交到后台，注意cstf_token的问题
+
+```javascript
+$('#save').click(function () {
+    // 设计为首先推出编辑模式以后才能保存
+    var editornot = $('#editmodelornot');
+    if ($(editornot).hasClass('btn-warning')) {
+        // 在编辑模式下应该退出
+        $('#tbbody').find(':checkbox').each(function () {
+            if ($(this).prop("checked")) {
+                var $tr = $(this).parent().parent();
+                trOutEdit($tr);
+            }
+        })
+        // 退出编辑模式记得修改按钮样式和文字。否则在下一次触发的时候会报错
+        $(editornot).removeClass('btn-warning');
+        $(editornot).text('进入编辑模式');
+    }
+    // 定一个修改资产的列表总表，下面去循环每一个发生变化的项然后append进来
+    var all_list = [];
+    // 退出以后获取用户修改过的数据，然后通过ajax提交到后台
+    $('#tbbody').children().each(function () {
+        // $(this)这里指的就是tr
+        var $tr = $(this);
+        var nid = $tr.attr('nid');
+        var row_dict = {};
+        var flag = false;
+        $tr.children().each(function () {
+            // 要判断是否可编辑，同时还要判断下拉框的情况下
+            if ($(this).attr('edit-enable') === 'true') {
+                if ($(this).attr('edit-type') == 'select') {
+                    var newData = $(this).attr('new-origin');
+                    var oldData = $(this).attr('origin');
+                    if (newData) {
+                        if (newData != oldData) {
+                            var name = $(this).attr('name');
+                            row_dict[name] = newData;
+                            // 如果写过数据就置位为true
+                            flag = true;
+                         }
+                     }
+                } else {
+                    var newData = $(this).text();
+                    var oldData = $(this).attr('origin');
+                    if (newData != oldData) {
+                        var name = $(this).attr('name');
+                        row_dict[name] = newData;
+                        // 如果写过数据就置位为true
+                        flag = true;
+                    }
+                }
+            }
+        });
+   
+        // 如果没有编辑的话dict可能为空，因此要做一下判断
+        if (flag) {
+            // 在这里我加了个判断，做了修改的一个是要传递一下资产的id过去
+            // 再有就是把这一条资产添加到这个all_list中去。
+            row_dict['id'] = nid;
+            all_list.push(row_dict);
+        }
+    });
+    /**
+     * RestfulApi
+     * 添加：post；获取用get；删除：delete；修改:put
+     * */
+    $.ajax({
+        url: url,
+        method: 'PUT',
+        headers: {"X-CSRFToken": $(csrftoken).val()},
+        data: JSON.stringify(all_list),
+        success: function (arg) {
+        	console.log(arg);
+        }
+    })
+});
+```
+
+后台接收到以后的形式就是这样的：
+
+```javascript
+# 形如这样一个列表套多个字典的的形式
+[{
+    "sys_name":"4",
+    "job_type":"4",
+    "job_describe":"协助123123发版脚本修改",
+    "job_user":"123123",
+    "ops3":"4",
+    "oprate":"2",
+    "status":"2",
+    "job_method":"修改环境变量处理nohup无法直接调用java的问题",
+    "job_time":"4",
+    "note":"null22222",
+    "id":"1"
+},{……},{……},
+]
+
+# 因为对应的一个个小字典的key其实都是对应的我们的字典的值，因此可以直接进行更新
+all_list = json.loads(request.body.decode('utf-8'))
+for row in all_list:
+    nid = row.pop('id')
+    models.Server.objects.filter(id=nid).update(**row)
+```
+
+### 新增
+
+关于新增，后期补充，新增视业务的不同而不同，如果内容少量内容的添加可以直接使用模态框就可以了，如果多数内容的添加，也可以针对这个内容单独设置一个页面进行添加也是可以的。换句话说就是这个添加的操作不适合封装到这个curd插件里，关于这个内容，直接写一个a标签触发事件最方便。
