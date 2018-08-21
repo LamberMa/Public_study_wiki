@@ -50,7 +50,7 @@ render(request, 'login.html', {
 
 # 直接调用字典里的内容。
 {% for i in userinfo.items %} # userinfo.keys,userinfo.values
-print something
+    print something
 {% endfor %}
 ```
 
