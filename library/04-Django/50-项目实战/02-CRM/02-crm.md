@@ -47,3 +47,37 @@ inclusion_tag表示要导入一个html模板
 
 
 
+使用type
+
+```python
+什么是单例：例指的就是实例，单例指的是不管你怎么执行，用的始终是第一个实例。
+class Foo:
+    def __init__(self):
+        pass
+    
+obj1 = Foo()
+obj2 = Foo()
+
+上面这个是简单的实例化
+
+class Foo():
+    _instance = None
+    def __init__(self):
+        pass
+    
+    @classmethod
+    def get_instance(cls):
+        if cls._instance:
+            return cls._instance
+        else:
+            obj = cls()
+            cls._instance = obj
+            return obj
+
+a1 = Foo.get_instance()
+
+或者模块只导入一次的方式进行单例
+
+
+```
+
