@@ -78,6 +78,72 @@ a1 = Foo.get_instance()
 
 或者模块只导入一次的方式进行单例
 
+__new__和__init__
 
+class Foo:
+    def __init__(self):
+        pass
+    
+    def __new__(cls, *args, **kwargs):
+        return object.__new__(cls, *args, **kwargs)
+
+new的作用就是创建对象，new创建完了以后再执行init方法，这里的这个self就是创建的这个对象。
+class Foo:
+    _instance = None
+    def __init__(self):
+        pass
+    
+    def __new__(cls, *args, **kwargs):
+        if cls._instance:
+            return cls._instance
+        else:
+            obj = object.__new__(cls, *args, **kwargs)
+            cls._instance = obj
+            return obj
+这样就比上面的要更好一些，对于用户的写法来说没有太大的改变。
+
+单例模式可以用于自定义curd组件，或者发布文章的时候对于特殊字符的过滤，或者数据库等
 ```
+
+![](http://tuku.dcgamer.top/18-8-27/51886299.jpg)
+
+
+
+单例模式：
+
+- 模块导入
+- 类方法
+- \_\_new\_\_方法
+
+用单例模式可以，用静态方法也可以。
+
+
+
+POPUP
+
+```javascript
+funtion popupUrl(url){
+    window.open(url, 'xxx', 'status=1, height:500, width:600, toobar=0, resizeable=0')
+}
+```
+
+xxx是一个别名，如果别名已经存在的话那么就不会弹出一个新的弹窗。相当于把之前的那个干掉重新生成一个名为xxx的弹窗
+
+如果popup嵌套创建下去的话，只要是通过opener都可以找到创造它的人。
+
+
+
+url多级namespace时反向
+
+![image-20180828164413142](/var/folders/8l/g95nllln61j4ly_zm_tqj2m40000gn/T/abnerworks.Typora/image-20180828164413142.png)
+
+reverse(namespace:n1)
+
+![image-20180828164859433](/var/folders/8l/g95nllln61j4ly_zm_tqj2m40000gn/T/abnerworks.Typora/image-20180828164859433.png)
+
+reverse(n1:n2:login)
+
+为什么要有namespace？为了添加namespace加以区分不同app之间的name
+
+分页
 
