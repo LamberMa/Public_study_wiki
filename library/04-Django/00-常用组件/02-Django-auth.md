@@ -1,5 +1,7 @@
 # Django Auth
 
+> 内容参考：www.cnblogs.com/liwenzhou/p/9030211.html
+
 ```python
 # session添加过程
 1.生成特殊字符串
@@ -20,13 +22,18 @@ def check_login(f):
 
 ## Auth模块的简单实用
 
-- 创建用户，这样创建的用户其实是会扔到django为我们默认创建的初始表中的auth_user这张表中。
+- 创建超级用户，这样创建的用户其实是会扔到django为我们默认创建的初始表中的auth_user这张表中。
 
   ```shell
   python manage.py createsuperuser
   ```
 
+- 使用这个Auth模块：
+
+  ```python
   
+  ```
+
 
 ```python
 class AuthenticationMiddleware(MiddlewareMixin):
@@ -59,11 +66,10 @@ class AuthenticationMiddleware(MiddlewareMixin):
    AUTH_USER_MODEL = 'app01.UserInfo'
    ```
 
-   
 
 
 
-# 表结构设计
+
 
 
 
