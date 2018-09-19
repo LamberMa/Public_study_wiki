@@ -49,6 +49,8 @@
         - [flannel网络](?file=01-Linux运维/06-容器云/03-K8S手动部署/06-flannel网络 "flannel网络")
         - [Dashboard](?file=01-Linux运维/06-容器云/03-K8S手动部署/07-Dashboard "Dashboard")
     - [K8S自动化部署](?file=01-Linux运维/06-容器云/04-K8S自动化部署 "K8S自动化部署")
+    - **K8S**
+        - [k8s](?file=01-Linux运维/06-容器云/05-K8S/01-k8s "k8s")
 - **DBA运维**
     - **Mysql**
         - **Mysql的部署**
@@ -97,6 +99,7 @@
         - [Ansible](?file=01-Linux运维/08-运维自动化/03-Ansible/01-Ansible "Ansible")
     - **Jenkins**
         - [Jenkins部署与简单应用](?file=01-Linux运维/08-运维自动化/04-Jenkins/01-Jenkins部署与简单应用 "Jenkins部署与简单应用")
+        - [Jenkins参数化构建](?file=01-Linux运维/08-运维自动化/04-Jenkins/02-Jenkins参数化构建 "Jenkins参数化构建")
         - [Jenkins回滚](?file=01-Linux运维/08-运维自动化/04-Jenkins/04-Jenkins回滚 "Jenkins回滚")
         - [Jenkins File](?file=01-Linux运维/08-运维自动化/04-Jenkins/05-Jenkins File "Jenkins File")
 - **DevOps**
@@ -208,7 +211,10 @@
         - [如何解决git本地和远端冲突的问题](?file=03-Python实战/01-生产实践技能/01-Git/02-如何解决git本地和远端冲突的问题 "如何解决git本地和远端冲突的问题")
 - **爬虫**
     - [爬虫1](?file=03-Python实战/02-爬虫/01-爬虫1 "爬虫1")
+    - [rds_memcached](?file=03-Python实战/02-爬虫/02-rds_memcached "rds_memcached")
+    - [requests模块](?file=03-Python实战/02-爬虫/03-requests模块 "requests模块")
 - **算法**
+    - [算法基础](?file=03-Python实战/03-算法/01-算法基础 "算法基础")
 - **金融量化**
 - **Flask**
     - [Flask-入门](?file=03-Python实战/05-Flask/01-Flask-入门 "Flask-入门")
@@ -230,6 +236,7 @@
 ##### Django
 - **常用组件**
     - [验证码](?file=04-Django/00-常用组件/01-验证码 "验证码")
+    - [Django-auth](?file=04-Django/00-常用组件/02-Django-auth "Django-auth")
 - [Web框架的本质](?file=04-Django/01-Web框架的本质 "Web框架的本质")
 - [Django开篇](?file=04-Django/02-Django开篇 "Django开篇")
 - **Django ORM**
@@ -251,10 +258,12 @@
 - **RBAC**
     - [RBAC](?file=04-Django/10-RBAC/01-RBAC "RBAC")
 - [开工第一天](?file=04-Django/100-开工第一天 "开工第一天")
-- [Django-auth模块](?file=04-Django/11-Django-auth模块 "Django-auth模块")
 - [rabbitmq](?file=04-Django/12-rabbitmq "rabbitmq")
 - **Django-rest-framework**
     - [restframework](?file=04-Django/13-Django-rest-framework/01-restframework "restframework")
+- **Django源码剖析**
+    - [Django功能概览](?file=04-Django/14-Django源码剖析/01-Django功能概览 "Django功能概览")
+    - [runserver](?file=04-Django/14-Django源码剖析/03-runserver "runserver")
 - [Django待整理内容](?file=04-Django/30-Django待整理内容 "Django待整理内容")
 - **项目实战**
     - **CMDB**
@@ -265,8 +274,13 @@
         - [API验证&AES加密](?file=04-Django/50-项目实战/01-CMDB/05-API验证&AES加密 "API验证&AES加密")
         - [CURD1](?file=04-Django/50-项目实战/01-CMDB/06-CURD1 "CURD1")
         - [CURD2](?file=04-Django/50-项目实战/01-CMDB/07-CURD2 "CURD2")
+        - [CURD3](?file=04-Django/50-项目实战/01-CMDB/08-CURD3 "CURD3")
+        - [CURD代码](?file=04-Django/50-项目实战/01-CMDB/09-CURD代码 "CURD代码")
         - [CMDB-1](?file=04-Django/50-项目实战/01-CMDB/99-CMDB-1 "CMDB-1")
     - **CRM**
+        - [crm1](?file=04-Django/50-项目实战/02-CRM/01-crm1 "crm1")
+        - [DjangoAdmin](?file=04-Django/50-项目实战/02-CRM/02-DjangoAdmin "DjangoAdmin")
+        - [crm](?file=04-Django/50-项目实战/02-CRM/03-crm "crm")
     - **堡垒机**
         - [堡垒机](?file=04-Django/50-项目实战/03-堡垒机/01-堡垒机 "堡垒机")
     - **Blog**
