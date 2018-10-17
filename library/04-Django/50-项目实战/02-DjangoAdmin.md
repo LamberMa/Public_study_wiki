@@ -160,6 +160,7 @@ def include(arg, namespace=None):
             'module, or pass a 2-tuple containing the list of patterns and '
             'app_name instead.',
         )
+    # 没写namespace，那么namespace和app_name就是一回事。
     namespace = namespace or app_name
     # Make sure the patterns can be iterated through (without this, some
     # testcases will break).
@@ -174,7 +175,7 @@ def include(arg, namespace=None):
     return (urlconf_module, app_name, namespace)
 ```
 
-现在知道include实际返回的内容了以后其实我们就可以实际在path这里写一个元组了：
+现在知道include实际返回的内容了以后其实我们就可以实际在path这里写一个元组了，其实这里是两种找法，如果返回的是一个模块，它会自己去里面找urlpatterns这个对应关系，如果返回的是一个元组（列表），那么就是直接的对应关系：
 
 ```python
 urlpatterns = [
@@ -475,7 +476,6 @@ ModelAdmin中提供了大量的可定制功能，接下来对这些功能进行�
       actions_selection_counter = True
   ```
 
-  
 
 
 
@@ -749,3 +749,11 @@ site = LamberSite()
 ```
 
 admin中site是AdminSite返回的对象，这里我们也照葫芦画瓢定义个LamberSite，在入口函数中，调用了v1.site.urls方法。
+
+
+
+## 小结：
+
+### Include
+
+如果传入的是一个路径，它会去自动导入模块，然后找urlpatterns这个变量。urlpatterns对应的是一个列表，列表里对应的就是一个url对应关系。
