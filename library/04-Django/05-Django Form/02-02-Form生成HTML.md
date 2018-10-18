@@ -330,7 +330,8 @@ class FInfo(forms.Form):
     # 这个方法需要对应的model的classes类加一个__str__方法然后return self.title，因为默认显示的其实是对象，而不是这个数据的名称，value是值。所以要单独加__str__方法。
     xx = form_model.ModelMultipleChoiceField(queryset=models.NNewType.objects.all())
     # xx = form_model.ModelChoiceField(queryset=models.Classes.objects.all()) 单选
-    # 但是这种方法并不推荐使用，适用于代码量比较少或者小的时候可以使用，因为必须结合module使用（比如给model加一个__str__方法），耦合性略高。简单的程序可以去使用，推荐使用上面的上面的去操作self.fields的方式。
+    # 但是这种方法并不推荐使用，适用于代码量比较少或者小的时候可以使用，因为必须结合model使用（比如给model加一个__str__方法），耦合性略高。简单的程序可以去使用，推荐使用上面的上面的去操作self.fields的方式。
+    # 毕竟我们自己取数据字段值不依赖于__str__方法，相对更加也灵活性，因此继承也是推荐的方法。
 ```
 
 ### 其他常用插件

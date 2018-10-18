@@ -5,28 +5,30 @@
 - **常用命令**
     - **常用简单命令**
         - [简单命令-1](?file=01-Linux运维/00-常用命令/01-常用简单命令/01-简单命令-1 "简单命令-1")
-- **常用服务搭建**
+    - [iptables](?file=01-Linux运维/00-常用命令/02-iptables "iptables")
+- **常用服务**
     - **Tomcat**
-        - [Tomcat基础部署](?file=01-Linux运维/01-常用服务搭建/01-Tomcat/001-Tomcat基础部署 "Tomcat基础部署")
-        - [Tomcat目录结构](?file=01-Linux运维/01-常用服务搭建/01-Tomcat/002-Tomcat目录结构 "Tomcat目录结构")
-        - [Tomcat的日志](?file=01-Linux运维/01-常用服务搭建/01-Tomcat/003-Tomcat的日志 "Tomcat的日志")
-        - [Tomcat配置https](?file=01-Linux运维/01-常用服务搭建/01-Tomcat/006-Tomcat配置https "Tomcat配置https")
+        - [Tomcat基础部署](?file=01-Linux运维/01-常用服务/01-Tomcat/001-Tomcat基础部署 "Tomcat基础部署")
+        - [Tomcat目录结构](?file=01-Linux运维/01-常用服务/01-Tomcat/002-Tomcat目录结构 "Tomcat目录结构")
+        - [Tomcat的日志](?file=01-Linux运维/01-常用服务/01-Tomcat/003-Tomcat的日志 "Tomcat的日志")
+        - [Tomcat配置https](?file=01-Linux运维/01-常用服务/01-Tomcat/006-Tomcat配置https "Tomcat配置https")
     - **Haproxy**
-        - [Haproxy介绍&部署](?file=01-Linux运维/01-常用服务搭建/02-Haproxy/01-Haproxy介绍&部署 "Haproxy介绍&部署")
+        - [Haproxy介绍&部署](?file=01-Linux运维/01-常用服务/02-Haproxy/01-Haproxy介绍&部署 "Haproxy介绍&部署")
     - **LNMP**
-        - [概念性的问题](?file=01-Linux运维/01-常用服务搭建/06-LNMP/001-概念性的问题 "概念性的问题")
-        - [认识Nginx](?file=01-Linux运维/01-常用服务搭建/06-LNMP/002-认识Nginx "认识Nginx")
+        - [概念性的问题](?file=01-Linux运维/01-常用服务/06-LNMP/001-概念性的问题 "概念性的问题")
+        - [认识Nginx](?file=01-Linux运维/01-常用服务/06-LNMP/002-认识Nginx "认识Nginx")
     - **Squid**
-        - [Squid介绍和部署](?file=01-Linux运维/01-常用服务搭建/08-Squid/01-Squid介绍和部署 "Squid介绍和部署")
-        - [Squid的特性](?file=01-Linux运维/01-常用服务搭建/08-Squid/02-Squid的特性 "Squid的特性")
-        - [Squid服务应用](?file=01-Linux运维/01-常用服务搭建/08-Squid/03-Squid服务应用 "Squid服务应用")
-        - [Squid ACL应用](?file=01-Linux运维/01-常用服务搭建/08-Squid/04-Squid ACL应用 "Squid ACL应用")
-        - [Squid代理](?file=01-Linux运维/01-常用服务搭建/08-Squid/05-Squid代理 "Squid代理")
+        - [Squid介绍和部署](?file=01-Linux运维/01-常用服务/08-Squid/01-Squid介绍和部署 "Squid介绍和部署")
+        - [Squid的特性](?file=01-Linux运维/01-常用服务/08-Squid/02-Squid的特性 "Squid的特性")
+        - [Squid服务应用](?file=01-Linux运维/01-常用服务/08-Squid/03-Squid服务应用 "Squid服务应用")
+        - [Squid ACL应用](?file=01-Linux运维/01-常用服务/08-Squid/04-Squid ACL应用 "Squid ACL应用")
+        - [Squid代理](?file=01-Linux运维/01-常用服务/08-Squid/05-Squid代理 "Squid代理")
 - **Linux Shell**
 - **日常运维总结**
     - [常用小技巧](?file=01-Linux运维/03-日常运维总结/00-常用小技巧 "常用小技巧")
     - [进程管理](?file=01-Linux运维/03-日常运维总结/01-进程管理 "进程管理")
     - [nmon](?file=01-Linux运维/03-日常运维总结/02-nmon "nmon")
+    - [常见错误集锦](?file=01-Linux运维/03-日常运维总结/99-常见错误集锦 "常见错误集锦")
 - **Centos7特性**
 - **Python&Linux**
     - [简单实用](?file=01-Linux运维/05-Python&Linux/1-简单实用 "简单实用")
@@ -92,6 +94,7 @@
         - [Twitter-TwemProxy](?file=01-Linux运维/07-DBA运维/02-Redis/10-Twitter-TwemProxy "Twitter-TwemProxy")
         - [redis3.x集群](?file=01-Linux运维/07-DBA运维/02-Redis/11-redis3.x集群 "redis3.x集群")
         - [Redis运维注意事项](?file=01-Linux运维/07-DBA运维/02-Redis/15-Redis运维注意事项 "Redis运维注意事项")
+    - [叶问](?file=01-Linux运维/07-DBA运维/03-叶问 "叶问")
 - **运维自动化**
     - **Cobbler**
     - **Saltstack**
@@ -102,6 +105,8 @@
         - [Jenkins参数化构建](?file=01-Linux运维/08-运维自动化/04-Jenkins/02-Jenkins参数化构建 "Jenkins参数化构建")
         - [Jenkins回滚](?file=01-Linux运维/08-运维自动化/04-Jenkins/04-Jenkins回滚 "Jenkins回滚")
         - [Jenkins File](?file=01-Linux运维/08-运维自动化/04-Jenkins/05-Jenkins File "Jenkins File")
+- **ELK**
+    - [ELK认识](?file=01-Linux运维/09-ELK/01-ELK认识 "ELK认识")
 - **DevOps**
 
 ##### Python基础
@@ -252,6 +257,7 @@
     - [04-Form组件内部原理](?file=04-Django/05-Django Form/04-04-Form组件内部原理 "04-Form组件内部原理")
     - **05-Form注册实例**
         - [Form组件定义](?file=04-Django/05-Django Form/05-05-Form注册实例/01-Form组件定义 "Form组件定义")
+    - [ModelForm](?file=04-Django/05-Django Form/06-ModelForm "ModelForm")
 - [Django模板](?file=04-Django/07-Django模板 "Django模板")
 - [Cookie和Session](?file=04-Django/08-Cookie和Session "Cookie和Session")
 - [Django安全](?file=04-Django/09-Django安全 "Django安全")
@@ -278,9 +284,12 @@
         - [CURD代码](?file=04-Django/50-项目实战/01-CMDB/09-CURD代码 "CURD代码")
         - [CMDB-1](?file=04-Django/50-项目实战/01-CMDB/99-CMDB-1 "CMDB-1")
     - **CRM**
-        - [crm1](?file=04-Django/50-项目实战/02-CRM/01-crm1 "crm1")
-        - [DjangoAdmin](?file=04-Django/50-项目实战/02-CRM/02-DjangoAdmin "DjangoAdmin")
-        - [crm](?file=04-Django/50-项目实战/02-CRM/03-crm "crm")
+        - [Django的Admin](?file=04-Django/50-项目实战/02-CRM/01-Django的Admin "Django的Admin")
+        - [CRM概述](?file=04-Django/50-项目实战/02-CRM/02-CRM概述 "CRM概述")
+        - [定制启动文件](?file=04-Django/50-项目实战/02-CRM/03-定制启动文件 "定制启动文件")
+        - [Model&url生成](?file=04-Django/50-项目实战/02-CRM/04-Model&url生成 "Model&url生成")
+        - [处理用户请求](?file=04-Django/50-项目实战/02-CRM/05-处理用户请求 "处理用户请求")
+        - [数据操作](?file=04-Django/50-项目实战/02-CRM/06-数据操作 "数据操作")
     - **堡垒机**
         - [堡垒机](?file=04-Django/50-项目实战/03-堡垒机/01-堡垒机 "堡垒机")
     - **Blog**
@@ -289,6 +298,9 @@
         - [文件的上传](?file=04-Django/50-项目实战/04-Blog/08-文件的上传 "文件的上传")
         - [上传头像](?file=04-Django/50-项目实战/04-Blog/10-上传头像 "上传头像")
         - [在线编辑器使用](?file=04-Django/50-项目实战/04-Blog/22-在线编辑器使用 "在线编辑器使用")
+    - [crm1](?file=04-Django/50-项目实战/100-crm1 "crm1")
+    - [DjangoAdmin](?file=04-Django/50-项目实战/101-DjangoAdmin "DjangoAdmin")
+    - [crm](?file=04-Django/50-项目实战/102-crm "crm")
 - [Django常见小问题](?file=04-Django/99-Django常见小问题 "Django常见小问题")
 
 ##### Frontend
