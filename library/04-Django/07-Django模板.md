@@ -223,6 +223,10 @@ filter可以作为if的条件，但是simple_tag是无法作为if的条件语句
 
 反向生成URL就是使用的simple_tag的方法，因为参数无限制。一般情况下，filter用不到，所以作为了解就可以了。
 
+**使用inclusion_tag完成更复杂的操作**
+
+
+
 ## 4、模板之Include
 
 > 模板之include，include单独的小组件。
@@ -252,3 +256,38 @@ python3 manage.py shell
 >>> print(t.render(c))
 My name is lamber
 ```
+
+## 6、CBV&FBV
+
+### CBV
+
+在视图函数匹配的时候，一个url可以对应一个函数，但是同时也可以对应一个类。
+
+```python
+# Login是一个类，其中as_view()是特殊的写法
+url(r'^login.html$', views.Login.as_view())
+
+# 这个类需要继承这个Views
+# 看的是类里是不是getattr GET POST利用反射获取对应的方法
+from django.views import View
+class Login(View):
+    
+    def get(self, request):
+        pass
+    
+    def post(self, request):
+        pass
+    
+    def dispath(self, request, *args, **kwargs):
+        # 可以对dispatch进行重写，先把父类的功能拿过来，先执行dispatch方法，然后dispatch去执行GET或者post方法，然后拿到返回值return才行
+        # 我们可以在执行dispatch的时候对一些方法进行统一的调用，或者循环操作等等，类似一个装饰器。
+        print('before')
+        obj = super(Login, self).dispatch(self, request, *args, **kwargs)
+        print('after')
+        # 接收的这个obj就是返回值。
+        return obj
+    
+GET和POST方法执行之前还执行了一个dispatch方法，这个即使利用反射获取GET还是POST，可以在父类Views里查看
+```
+
+fbv其实就是之前写的最多的函数的形式，就不过多赘述了。

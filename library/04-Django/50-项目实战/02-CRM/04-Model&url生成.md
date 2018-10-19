@@ -166,4 +166,28 @@ NoReverseMatch at /lamber/login/
 Reverse for 'login' not found. 'login' is not a valid view function or pattern name.
 ```
 
-知道如何能在这里生成反向url了，那么如何应用到现在的项目中呢？
+知道如何生成反向URL了，那么根据我们定制的规则，其实就可以通过拼接name得到对应的url了。
+
+## 多级namespace反向URL
+
+url的对应关系是可以嵌套的，比如：
+
+```python
+urlpatterns = [
+    path('test1/', include([
+        path('aaa/', include([
+            path('bbb/', views.bbb, name='bbb')
+        ], namespace='n2')),
+    ], namespace='n1'))
+]
+```
+
+针对这种情况下要按照如下的办法生成反向url：
+
+```python
+from django.urls import reverse
+# 这个namespace多层嵌套的情况下，从最外层开始依次往下写就可以了。有几层套几层就行了。
+print(reverse(n1:n2:bbb))
+```
+
+namespace的意义在于区分不同的app之间重复的反向name的情况。
