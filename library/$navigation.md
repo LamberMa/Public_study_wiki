@@ -242,6 +242,7 @@
 - **常用组件**
     - [验证码](?file=04-Django/00-常用组件/01-验证码 "验证码")
     - [Django-auth](?file=04-Django/00-常用组件/02-Django-auth "Django-auth")
+    - [分页](?file=04-Django/00-常用组件/03-分页 "分页")
 - [Web框架的本质](?file=04-Django/01-Web框架的本质 "Web框架的本质")
 - [Django开篇](?file=04-Django/02-Django开篇 "Django开篇")
 - **Django ORM**
@@ -288,9 +289,11 @@
         - [CRM概述](?file=04-Django/50-项目实战/02-CRM/02-CRM概述 "CRM概述")
         - [定制启动文件](?file=04-Django/50-项目实战/02-CRM/03-定制启动文件 "定制启动文件")
         - [Model&url生成](?file=04-Django/50-项目实战/02-CRM/04-Model&url生成 "Model&url生成")
-        - [处理用户请求](?file=04-Django/50-项目实战/02-CRM/05-处理用户请求 "处理用户请求")
+        - [数据展示](?file=04-Django/50-项目实战/02-CRM/05-数据展示 "数据展示")
         - [数据操作](?file=04-Django/50-项目实战/02-CRM/06-数据操作 "数据操作")
         - [数据分页展示](?file=04-Django/50-项目实战/02-CRM/07-数据分页展示 "数据分页展示")
+        - [定制Actions](?file=04-Django/50-项目实战/02-CRM/08-定制Actions "定制Actions")
+        - [组合搜索](?file=04-Django/50-项目实战/02-CRM/09-组合搜索 "组合搜索")
     - **堡垒机**
         - [堡垒机](?file=04-Django/50-项目实战/03-堡垒机/01-堡垒机 "堡垒机")
     - **Blog**
