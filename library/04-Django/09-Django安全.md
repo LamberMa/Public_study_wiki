@@ -70,8 +70,15 @@ class Foo(View):
     def dispatch(self,request,*args,**kwargs):
         return xxx
     
-# 如果是给dispatch加这个装饰器的话也相当于给所有的加了，因为dispatch是一个入口函数，有dispatch的时候是优先找到dispatch然后通过反射找的POST或者GET方法。
+# 当然也可以给dispathch方法加，如果是给dispatch加这个装饰器的话也相当于给所有的加了，因为dispatch是一个入口函数，有dispatch的时候是优先找到dispatch然后通过反射找的POST或者GET方法。
 @method_decorator(csrf_protect, name='dispatch')
+
+# 或者直接加载dispatch方法上
+class xxx(View):
+    
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        ……
 
 # 针对CSRF的装饰器只能给CBV的类加，不能给CBV类下的方法加，这是csrf种一个比较变态的规定。我们自己自定义的装饰器应该是ok的
 ```
