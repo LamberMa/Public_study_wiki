@@ -332,8 +332,91 @@ class AuthView(APIView):
 from rest_framework.authentication import BaseAuthentication
 ```
 
-为了规范都要继承默认的BaseAuthentication类。authenticate_header是认证失败的时候给你的浏览器返回的响应头。
+为了规范都要继承默认的BaseAuthentication类。authenticate_header是认证失败（这个是浏览器的一种认证机制）的时候给你的浏览器返回的响应头。BaseAuthentication这个类其实啥都没写，就是定义了两个方法，一个authenticate一个authenticate_header方法。而且authenticate必须要重写，否则会报错。
 
+其他的内置认证类型还包括Session的，Token的，RemoteUser的，不过这些认证都是基于DJango的，以Session距离，它会去获取request.user这个选项，但是如果我们自己去写session的时候是没有这个内容的。request.user是基于Django的。再比如RemoteUser是基于Django的auth去进行认证的。因此内置的这几种方法其实都是有一定局限性的，因此认证类，一般是我们自己去写，不会去用到DRF原生的。
+
+说一下BasicAuthentication，这个是基于浏览器的账号密码认证，在访问页面的时候会以浏览器的形式弹出来一个账号密码的认证输入框，浏览器会把输入的账号密码进行加密，加密的形式如下：
+
+```python
+HTTP_AUTHORIZATION: "basic (用户名+密码)base64转码"
+```
+
+在BasicAuthentication中会去获取这一部分：
+
+```python
+def get_authorization_header(request):
+    """
+    Return request's 'Authorization:' header, as a bytestring.
+
+    Hide some test client ickyness where the header can be unicode.
+    """
+    # 从request.META中把这个HTTP_AUTHORIZATION取出来。
+    auth = request.META.get('HTTP_AUTHORIZATION', b'')
+    if isinstance(auth, text_type):
+        # Work around django test client oddness
+        auth = auth.encode(HTTP_HEADER_ENCODING)
+    return auth
+```
+
+拿到base64转码后的内容进行解码的操作。
+
+```python
+class BasicAuthentication(BaseAuthentication):
+    """
+    HTTP Basic authentication against username/password.
+    """
+    www_authenticate_realm = 'api'
+
+    def authenticate(self, request):
+        """
+        Returns a `User` if a correct username and password have been supplied
+        using HTTP Basic authentication.  Otherwise returns `None`.
+        """
+        auth = get_authorization_header(request).split()
+		# 如果返回为None或者不是basic认证，那么return None
+        if not auth or auth[0].lower() != b'basic':
+            return None
+        if len(auth) == 1:
+            msg = _('Invalid basic header. No credentials provided.')
+            raise exceptions.AuthenticationFailed(msg)
+        elif len(auth) > 2:
+            msg = _('Invalid basic header. Credentials string should not contain spaces.')
+            raise exceptions.AuthenticationFailed(msg)
+
+        try:
+            # 开始base64解码
+            auth_parts = base64.b64decode(auth[1]).decode(HTTP_HEADER_ENCODING).partition(':')
+        except (TypeError, UnicodeDecodeError, binascii.Error):
+            msg = _('Invalid basic header. Credentials not correctly base64 encoded.')
+            raise exceptions.AuthenticationFailed(msg)
+
+        userid, password = auth_parts[0], auth_parts[2]
+        return self.authenticate_credentials(userid, password, request)
+```
+
+## 小结
+
+### authenticate返回值
+
+- None：我不管了，下一个认证来执行
+- 抛出异常，`raise exception.AuthenticationFailed('Auth Failed')`
+- 返回一个元组，(user obj，auth obj)，因此元素一赋值给request.user，元素二赋值给request.auth
+
+### 使用范围
+
+- 局部使用：视图类中写一个静态字段，authentication_classes，列表里面是类的名称，这里和全局不一样。
+
+- 全局使用，在settings中配置：
+
+  ```python
+  REST_FRAMEWORK = {
+      # 这里写的是认证类的路径，可以单独扔到一个py文件里
+      'DEFAULT_AUTHENTION_CLASSES': ['api.utils.auth.Authtication', ],
+      'UNAUTHENTICATED_USER': None,
+      'UNAUTHENTICATED_TOKEN': None,
+  }
+  ```
 
 
 
