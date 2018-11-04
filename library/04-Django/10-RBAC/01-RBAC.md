@@ -10,19 +10,19 @@
 
 RBAC有什么优势？它简化了用户和权限的关系，并且易于扩展和维护。比如用户直接关联权限明细的话，不同的用户可能存在大量重复的权限，这样当权限和用户比较多的时候要维护的内容量是巨大的，现在将角色与具体的权限进行关联，而用户和角色进行挂钩。
 
-![图源：https://www.cnblogs.com/lamp01/p/6576432.html](http://omk1n04i8.bkt.clouddn.com/18-6-12/82751409.jpg)
+![图源：https://www.cnblogs.com/lamp01/p/6576432.html](http://tuku.dcgamer.top/18-6-12/82751409.jpg)
 
 赋予角色不同的权限，针对不同的权限还应该有不同的操作（actions），比如针对用户列表，有的就只有查看用户的功能，有的权限能添加，有的权限甚至可以删除和修改，这就是针对不同权限（permission）的不同操作（actions）。我们可以更细致的去把控。
 
-![](http://omk1n04i8.bkt.clouddn.com/18-6-12/44715052.jpg)
+![](http://tuku.dcgamer.top/18-6-12/44715052.jpg)
 
 根据如上说明的功能，可以抽象出如下功能模块：
 
-![](http://omk1n04i8.bkt.clouddn.com/18-6-12/31584515.jpg)
+![](http://tuku.dcgamer.top/18-6-12/31584515.jpg)
 
 对应权限控制的逻辑流程如下：
 
-![](http://omk1n04i8.bkt.clouddn.com/18-6-12/33797457.jpg)
+![](http://tuku.dcgamer.top/18-6-12/33797457.jpg)
 
 ## RBAC数据库设计
 
@@ -726,3 +726,13 @@ class RbacMiddleware(MiddlewareMixin):
 
 ```
 
+
+
+
+
+## 小结
+
+### RBAC的使用
+
+- 在installed_apps中进行导入，导入以后可以先生成表，`pythono manage.py makemigrations && python manage.py migrate`
+- 引入中间件，rbac的中间件。
