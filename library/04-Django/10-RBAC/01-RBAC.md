@@ -246,6 +246,7 @@ class M1(MiddlewareMixin):
             # 把action拿到手
             action = request.GET.get('md')
             # 我首先看你这个权限列表有没有，如果没有，不好意思，直接不能访问。
+            # 这一步也可以直接封装到service中的某一个方法中去。
             user_permission_dict = request.session.get('user_permission_dict')
             if not user_permission_dict:
                 return HttpResponse('无权限')
@@ -317,6 +318,8 @@ def menu(request):
         all_menu_dict[row['id']] = row
         
     for per in permission_list:
+        # 允许有的权限可以不挂靠到菜单上，因为本函数操作仅仅是和菜单相关
+        # 所以如果不挂靠菜单的话完全可以pass掉。
         if not per['permission__menu_id']:
             continue
 
@@ -496,11 +499,11 @@ class UserInfo(models.Model):
     user = models.OneToOneField(RbacUser)
 ```
 
-三种情况会调用
+三种情况会调用rbac中的方法。
 
 - 登录成功，写session，sevice.permission_session(userid，request)
 - 做检测，在配置文件中注册中间件。
-- 生成菜单，调用service里面的menu，css，js方法。如果要实现动态菜单的话就把这个菜单的信息放到session里面去。只要从session中获取到就可以了。可以通过simple_tag来实现。
+- 生成菜单，调用service里面的menu，css，js方法。如果要实现动态菜单的话就把这个菜单的信息放到session里面去。只要从session中获取到就可以了。可以通过simple_tag来实现。反正就是要不调用方法，要不就是使用simpletag实现。其实生成menu也可以使用simpletag来生成。因此这里改进使用simpletag来完成。
 
 ### 用户权限采集
 
@@ -509,6 +512,7 @@ class UserInfo(models.Model):
 首先在系统settings文件中添加一下内容，后面的操作会逐一用到并做说明：
 
 ```python
+# 无需权限控制的URL
 RBAC_NO_AUTH_URL = [
     '/index.html',
     '/login.html',
@@ -516,6 +520,7 @@ RBAC_NO_AUTH_URL = [
     '/admin.*',
     '/rbac.*',
 ]
+# RBAC生成的动态权限的key叫什么
 RBAC_PERMISSION_SESSION_KEY = "rbac_permission_session_key"
 
 # 把菜单放在session中，这一个取的是权限的session的key
@@ -525,7 +530,7 @@ RBAC_MENU_KEY = "rbac_menu_key"
 # 权限信息
 RBAC_MENU_PERMISSION_KEY = "rbac_menu_permission_key"
 
-"""
+"""这个只生成菜单和action没关系
 session[RBAC_MENU_PERMISSION_SESSION_KEY] = {
     RBAC_MENU_KEY:菜单信息,
     RBAC_MENU_PERMISSION_KEY:权限信息
@@ -533,7 +538,9 @@ session[RBAC_MENU_PERMISSION_SESSION_KEY] = {
 """
 # RBAC的默认主题
 RBAC_THEME = "default"
+# 确认你要进行的行为操作
 RBAC_QUERY_KEY = "md"
+# 默认的查询行为
 RBAC_DEFAULT_QUERY_VALUE = "look"
 # 无权访问的时候提示的消息
 RBAC_PERMISSION_MSG = "无权限访问"
@@ -723,7 +730,26 @@ class RbacMiddleware(MiddlewareMixin):
 #### 视图函数
 
 ```python
+def login(request):
+    if request.method == 'GET':
+        xxxx
+    else:
+        u = request.POST.get('username')
+        p = request.POST.get('password')
+        obj = models.UserInfo.objects.filter(user__username=u, user__password=p)
+        if obj:
+            from rbac.service import initial_permission
+            initial_permission(request, obj.user_id)
+        
+class RbacView(object):
+    def dispatch(self, request, *args, **kwargs):
+        permission_code = request.permission_code.lower()
+        handler = getattr(self, permission_code)
+        return handler(request, *args, **kwargs)
 
+        
+class Index(RbacView, View):
+    pass
 ```
 
 
