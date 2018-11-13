@@ -196,6 +196,4 @@ ModelForm
             model_form_obj = XXOOModelForm(initial={...})
 ```
 
-![image-20181016154200464](/var/folders/8l/g95nllln61j4ly_zm_tqj2m40000gn/T/abnerworks.Typora/image-20181016154200464.png)
-
 咱们自己写的优先级更高。
