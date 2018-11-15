@@ -35,26 +35,6 @@
 - **Python&Linux**
     - [简单实用](?file=01-Linux运维/05-Python&Linux/1-简单实用 "简单实用")
     - [使用python编写脚本](?file=01-Linux运维/05-Python&Linux/2-使用python编写脚本 "使用python编写脚本")
-- **容器云**
-    - **Docker基础使用**
-        - [Docker介绍](?file=01-Linux运维/06-容器云/01-Docker基础使用/01-Docker介绍 "Docker介绍")
-        - [Docker数据存储和网络访问](?file=01-Linux运维/06-容器云/01-Docker基础使用/02-Docker数据存储和网络访问 "Docker数据存储和网络访问")
-        - [手动构建镜像](?file=01-Linux运维/06-容器云/01-Docker基础使用/03-手动构建镜像 "手动构建镜像")
-        - [DockerFile](?file=01-Linux运维/06-容器云/01-Docker基础使用/04-DockerFile "DockerFile")
-    - **Docker进阶**
-        - [Docker镜像生产实战](?file=01-Linux运维/06-容器云/02-Docker进阶/01-Docker镜像生产实战 "Docker镜像生产实战")
-        - [Docker-registetry](?file=01-Linux运维/06-容器云/02-Docker进阶/02-Docker-registetry "Docker-registetry")
-    - **K8S手动部署**
-        - [k8s介绍和环境准备](?file=01-Linux运维/06-容器云/03-K8S手动部署/01-k8s介绍和环境准备 "k8s介绍和环境准备")
-        - [CA证书制作](?file=01-Linux运维/06-容器云/03-K8S手动部署/02-CA证书制作 "CA证书制作")
-        - [ETCD集群部署](?file=01-Linux运维/06-容器云/03-K8S手动部署/03-ETCD集群部署 "ETCD集群部署")
-        - [K8S_master_node部署](?file=01-Linux运维/06-容器云/03-K8S手动部署/04-K8S_master_node部署 "K8S_master_node部署")
-        - [Node节点部署](?file=01-Linux运维/06-容器云/03-K8S手动部署/05-Node节点部署 "Node节点部署")
-        - [flannel网络](?file=01-Linux运维/06-容器云/03-K8S手动部署/06-flannel网络 "flannel网络")
-        - [Dashboard](?file=01-Linux运维/06-容器云/03-K8S手动部署/07-Dashboard "Dashboard")
-    - [K8S自动化部署](?file=01-Linux运维/06-容器云/04-K8S自动化部署 "K8S自动化部署")
-    - **K8S**
-        - [k8s](?file=01-Linux运维/06-容器云/05-K8S/01-k8s "k8s")
 - **DBA运维**
     - **Mysql**
         - **Mysql的部署**
@@ -246,6 +226,7 @@
     - [Django-auth](?file=04-Django/00-常用组件/02-Django-auth "Django-auth")
     - [分页](?file=04-Django/00-常用组件/03-分页 "分页")
     - [评论分级](?file=04-Django/00-常用组件/04-评论分级 "评论分级")
+    - [定时任务](?file=04-Django/00-常用组件/05-定时任务 "定时任务")
 - [Web框架的本质](?file=04-Django/01-Web框架的本质 "Web框架的本质")
 - [Django开篇](?file=04-Django/02-Django开篇 "Django开篇")
 - **Django ORM**
@@ -261,7 +242,7 @@
     - [04-Form组件内部原理](?file=04-Django/05-Django Form/04-04-Form组件内部原理 "04-Form组件内部原理")
     - **05-Form注册实例**
         - [Form组件定义](?file=04-Django/05-Django Form/05-05-Form注册实例/01-Form组件定义 "Form组件定义")
-    - [ModelForm](?file=04-Django/05-Django Form/06-ModelForm "ModelForm")
+    - [06-ModelForm](?file=04-Django/05-Django Form/06-06-ModelForm "06-ModelForm")
 - [Django模板](?file=04-Django/07-Django模板 "Django模板")
 - [Cookie和Session](?file=04-Django/08-Cookie和Session "Cookie和Session")
 - [Django安全](?file=04-Django/09-Django安全 "Django安全")
@@ -307,6 +288,9 @@
         - [文件的上传](?file=04-Django/50-项目实战/04-Blog/08-文件的上传 "文件的上传")
         - [上传头像](?file=04-Django/50-项目实战/04-Blog/10-上传头像 "上传头像")
         - [在线编辑器使用](?file=04-Django/50-项目实战/04-Blog/22-在线编辑器使用 "在线编辑器使用")
+    - **GIt**
+        - [Git的基本使用](?file=04-Django/50-项目实战/05-GIt/01-Git的基本使用 "Git的基本使用")
+        - [Git comment](?file=04-Django/50-项目实战/05-GIt/02-Git comment "Git comment")
     - [crm1](?file=04-Django/50-项目实战/100-crm1 "crm1")
     - [DjangoAdmin](?file=04-Django/50-项目实战/101-DjangoAdmin "DjangoAdmin")
     - [crm](?file=04-Django/50-项目实战/102-crm "crm")
@@ -355,6 +339,30 @@
 - **响应式前段实战**
     - [响应式介绍和BootStrap](?file=05-Frontend/08-响应式前段实战/01-响应式介绍和BootStrap "响应式介绍和BootStrap")
 
+##### 容器云
+- **Docker基础使用**
+    - [Docker介绍](?file=06-容器云/01-Docker基础使用/01-Docker介绍 "Docker介绍")
+    - [Docker数据存储和网络访问](?file=06-容器云/01-Docker基础使用/02-Docker数据存储和网络访问 "Docker数据存储和网络访问")
+    - [手动构建镜像](?file=06-容器云/01-Docker基础使用/03-手动构建镜像 "手动构建镜像")
+    - [DockerFile](?file=06-容器云/01-Docker基础使用/04-DockerFile "DockerFile")
+- **Docker进阶**
+    - [Docker镜像生产实战](?file=06-容器云/02-Docker进阶/01-Docker镜像生产实战 "Docker镜像生产实战")
+    - [Docker-registetry](?file=06-容器云/02-Docker进阶/02-Docker-registetry "Docker-registetry")
+- **K8S手动部署**
+    - [k8s介绍和环境准备](?file=06-容器云/03-K8S手动部署/01-k8s介绍和环境准备 "k8s介绍和环境准备")
+    - [CA证书制作](?file=06-容器云/03-K8S手动部署/02-CA证书制作 "CA证书制作")
+    - [ETCD集群部署](?file=06-容器云/03-K8S手动部署/03-ETCD集群部署 "ETCD集群部署")
+    - [K8S_master_node部署](?file=06-容器云/03-K8S手动部署/04-K8S_master_node部署 "K8S_master_node部署")
+    - [Node节点部署](?file=06-容器云/03-K8S手动部署/05-Node节点部署 "Node节点部署")
+    - [flannel网络](?file=06-容器云/03-K8S手动部署/06-flannel网络 "flannel网络")
+    - [Dashboard](?file=06-容器云/03-K8S手动部署/07-Dashboard "Dashboard")
+- [K8S自动化部署](?file=06-容器云/04-K8S自动化部署 "K8S自动化部署")
+- **K8S**
+    - [k8s](?file=06-容器云/05-K8S/01-k8s "k8s")
+- **Docker应用**
+    - **Gitlab**
+        - [DockerGitlab启动参数](?file=06-容器云/06-Docker应用/01-Gitlab/01-DockerGitlab启动参数 "DockerGitlab启动参数")
+
 ##### Java
 - [Java报错信息](?file=12-Java/01-Java报错信息 "Java报错信息")
 
@@ -373,8 +381,9 @@
         - [通过Vagrant管理vbox虚拟机](?file=18-电脑技能汇总/01-MacBook/03-软件使用篇/02-通过Vagrant管理vbox虚拟机 "通过Vagrant管理vbox虚拟机")
 - **Windows**
 
-##### RaspBerry
-- [参考资料](?file=19-RaspBerry/01-参考资料 "参考资料")
+##### Nas
+- [参考资料](?file=19-Nas/01-参考资料 "参考资料")
+- [内网穿透](?file=19-Nas/02-内网穿透 "内网穿透")
 
 ##### Go
 - [Go开发环境搭建](?file=20-Go/01-Go开发环境搭建 "Go开发环境搭建")
